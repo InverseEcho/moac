@@ -97,10 +97,11 @@ button { cursor: pointer; font-family: inherit; border: none; outline: none; bac
 input, textarea, select { font-family: inherit; outline: none; }
 ul, ol { list-style: none; }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 10px; border: 1px solid transparent; background-clip: content-box; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+::-webkit-scrollbar { width: 6px; height: 6px; background-color: transparent; }
+::-webkit-scrollbar-track { background-color: transparent; }
+::-webkit-scrollbar-thumb { background-color: var(--border-bright); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background-color: var(--text-muted); }
+* { scrollbar-width: thin; scrollbar-color: var(--border-bright) transparent; }
 
 /* Logo Glow & Flicker */
 .moac-logo {
@@ -434,7 +435,7 @@ ul, ol { list-style: none; }
   flex-shrink: 0;
   backdrop-filter: blur(20px);
   position: relative;
-  z-index: 10;
+  z-index: 200;
 }
 
 .topbar-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
@@ -487,7 +488,7 @@ ul, ol { list-style: none; }
 #chat-area {
   flex: 1;
   overflow-y: auto;
-  padding: 24px 0;
+  padding: 24px 0 190px !important;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -714,7 +715,8 @@ ul, ol { list-style: none; }
 .ai-bubble ol { list-style: decimal; }
 .ai-bubble li { margin: 4px 0; }
 .ai-bubble strong { font-weight: 700; }
-.ai-bubble em { font-style: italic; }
+.ai-bubble em { font-style: italic; color: var(--text-secondary); }
+.user-bubble em { font-style: italic; color: rgba(255, 255, 255, 0.85); }
 .ai-bubble a { color: var(--accent-2); text-decoration: underline; }
 .ai-bubble blockquote { border-left: 3px solid var(--accent); padding-left: 12px; margin: 10px 0; color: var(--text-secondary); font-style: italic; }
 .ai-bubble hr { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
@@ -903,15 +905,22 @@ ul, ol { list-style: none; }
 .file-attachment i { color: var(--accent); }
 
 #input-area {
-  padding: 8px 24px 10px;
-  background: var(--bg-primary);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 32px 24px 24px;
+  background: linear-gradient(to top, var(--bg-primary) 40%, transparent);
   flex-shrink: 0;
+  z-index: 100;
+  pointer-events: none;
 }
 
 .input-wrapper {
   max-width: 820px;
   margin: 0 auto;
   position: relative;
+  pointer-events: auto;
 }
 
 .scroll-to-bottom-btn {
@@ -981,8 +990,10 @@ ul, ol { list-style: none; }
 .context-chip-remove:hover { background: var(--red); color: white; }
 
 .input-box {
-  background: transparent;
-  border: 1px solid var(--border);
+  background: rgba(26, 29, 38, 0.72) !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--border-bright);
   border-radius: var(--radius-xl);
   padding: 12px 6px;
   padding-right: 6px;
@@ -991,6 +1002,10 @@ ul, ol { list-style: none; }
   gap: 10px;
   transition: var(--transition);
   box-shadow: var(--shadow-sm);
+}
+
+[data-theme="light"] .input-box {
+  background: rgba(255, 255, 255, 0.72) !important;
 }
 
 .input-box:focus-within {
@@ -1942,27 +1957,27 @@ kbd {
 .toast {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-bright);
   border-radius: var(--radius-md);
-  padding: 8px 12px;
-  min-width: 220px;
-  max-width: 300px;
+  padding: 6px 10px;
+  min-width: 180px;
+  max-width: 260px;
   box-shadow: var(--shadow-lg);
   pointer-events: all;
   animation: slideInRight 0.3s ease;
-  font-size: 0.82rem;
+  font-size: 0.76rem;
 }
 
 .toast-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   flex-shrink: 0;
 }
 
@@ -1972,8 +1987,8 @@ kbd {
 .toast.warning .toast-icon { background: rgba(245,158,11,0.15); color: var(--yellow); }
 
 .toast-body { flex: 1; }
-.toast-title { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
-.toast-msg { font-size: 0.76rem; color: var(--text-muted); }
+.toast-title { font-size: 0.76rem; font-weight: 600; color: var(--text-primary); }
+.toast-msg { font-size: 0.7rem; color: var(--text-muted); }
 
 .toast-close {
   font-size: 0.7rem;
@@ -2103,7 +2118,7 @@ kbd {
   #main { margin-left: 0 !important; }
   .suggestion-grid { grid-template-columns: 1fr; }
   .message-bubble { max-width: 95%; }
-  #input-area { padding: 10px 12px 14px; }
+  #input-area { padding: 32px 12px 14px; }
   .topbar-left .chat-title-input { font-size: 0.85rem; }
   .chat-item-actions { display: flex !important; }
 }
@@ -2132,7 +2147,7 @@ kbd {
   z-index: 0;
 }
 
-#chat-area, #input-area { position: relative; z-index: 1; }
+#chat-area { position: relative; z-index: 1; }
 
 .reaction-bar {
   display: flex;
@@ -2434,6 +2449,45 @@ body, .message-bubble, .chat-list-item, #sidebar, #topbar, .modal, .modal-overla
   animation: flash 2s ease-in-out;
 }
 
+/* Image bubble wrap removes redundant nesting frames for generated images */
+.image-bubble-wrap {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Floating custom styling for close button inside image viewer */
+.viewer-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none !important;
+  border: none !important;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 11000;
+  opacity: 0;
+  font-size: 1.8rem;
+  transition: all 0.25s ease;
+  padding: 8px;
+}
+.viewer-img-wrapper:hover .viewer-close-btn {
+  opacity: 1;
+}
+.viewer-close-btn:hover {
+  background: none !important;
+  color: #ef4444 !important;
+  transform: scale(1.15) !important;
+}
+
+/* Smooth transition for the toast container positioning */
+#toast-container {
+  transition: bottom 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
 </style>
 </head>
 <body>
@@ -2485,11 +2539,20 @@ body, .message-bubble, .chat-list-item, #sidebar, #topbar, .modal, .modal-overla
           <i class="fa-solid fa-bars"></i>
         </button>
         <input type="text" class="chat-title-input" id="chat-title-input" placeholder="Untitled chat" maxlength="80">
-      </div>
-      <div class="topbar-right">
-        <button class="topbar-toggle" onclick="toggleCmdPalette()" title="Search & Commands (⌘K)">
+        
+        <button class="topbar-toggle" onclick="toggleCmdPalette()" title="Search & Commands (⌘K)" style="margin-left: 8px;">
           <i class="fa-solid fa-magnifying-glass"></i>
         </button>
+
+        <div style="position: relative; margin-left: 8px;">
+           <button class="btn btn-secondary btn-sm" id="topbar-branches-btn" onclick="toggleDropdown('branches-dropdown')" style="display: none;">
+             <i class="fa-solid fa-code-branch text-accent"></i> <span id="topbar-branches-count" style="margin-left:4px; opacity:0.7"></span> <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; opacity: 0.6; margin-left:2px"></i>
+           </button>
+           <div class="dropdown-menu hidden" id="branches-dropdown" style="min-width: 260px; max-height: 60vh; overflow-y: auto; right: 0; left: auto;">
+           </div>
+        </div>
+      </div>
+      <div class="topbar-right">
         <div style="position: relative; margin-left: 4px;">
           <button class="btn btn-secondary btn-sm" onclick="toggleDropdown('pref-dropdown')" id="pref-btn">
             <i class="fa-solid fa-sliders"></i> Preferences <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; opacity: 0.6"></i>
@@ -2535,6 +2598,8 @@ body, .message-bubble, .chat-list-item, #sidebar, #topbar, .modal, .modal-overla
         <div class="pinned-messages-list hidden" id="pinned-messages-list"></div>
       </div>
 
+      <!-- HTML removed for branch viewer bar -->
+
       <div id="empty-state">
         <div class="empty-logo"><i class="fa-solid fa-robot"></i></div>
         <h1 class="empty-title">How can I help you?</h1>
@@ -2566,6 +2631,27 @@ body, .message-bubble, .chat-list-item, #sidebar, #topbar, .modal, .modal-overla
           <i class="fa-solid fa-arrow-down"></i>
         </button>
         <div class="input-context-chips" id="context-chips"></div>
+        
+        <!-- Inline Image Configuration Bar (Floating Overlay Pill with Symbols) -->
+        <div id="image-config-bar" class="hidden" style="display: none; position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); align-items: center; gap: 12px; padding: 4px 12px; background: rgba(26, 29, 38, 0.94); border: 1px solid var(--border-bright); border-radius: var(--radius-full); font-size: 0.75rem; color: var(--text-secondary); backdrop-filter: blur(16px); box-shadow: var(--shadow-lg), 0 4px 20px rgba(0,0,0,0.5); z-index: 100; pointer-events: auto; width: max-content; max-width: 90%; box-sizing: border-box;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+             <i class="fa-solid fa-crop-simple" style="color: var(--text-secondary); font-size: 0.8rem;" title="Image Aspect Ratio"></i>
+             <div class="ratio-toggle-group" style="display: flex; position: relative; background: rgba(0, 0, 0, 0.35); padding: 1.5px; border: 1px solid var(--border); border-radius: var(--radius-full); overflow: hidden; height: 22px; align-items: center; box-sizing: border-box;">
+                <div id="ratio-slider" style="position: absolute; background: var(--accent); border-radius: var(--radius-full); transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1; top: 1.5px; bottom: 1.5px;"></div>
+                <button class="ratio-btn active" onclick="setImageRatio('square')" data-ratio="square" style="position: relative; z-index: 2; padding: 2px 10px; font-size: 0.68rem; border: none; background: none; color: white; cursor: pointer; border-radius: var(--radius-full); font-weight: 500; transition: color 0.15s; height: 100%; display: flex; align-items: center; justify-content: center;">1:1</button>
+                <button class="ratio-btn" onclick="setImageRatio('portrait')" data-ratio="portrait" style="position: relative; z-index: 2; padding: 2px 10px; font-size: 0.68rem; border: none; background: none; color: var(--text-secondary); cursor: pointer; border-radius: var(--radius-full); font-weight: 500; transition: color 0.15s; height: 100%; display: flex; align-items: center; justify-content: center;">2:3</button>
+                <button class="ratio-btn" onclick="setImageRatio('landscape')" data-ratio="landscape" style="position: relative; z-index: 2; padding: 2px 10px; font-size: 0.68rem; border: none; background: none; color: var(--text-secondary); cursor: pointer; border-radius: var(--radius-full); font-weight: 500; transition: color 0.15s; height: 100%; display: flex; align-items: center; justify-content: center;">3:2</button>
+             </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; cursor: pointer; border-left: 1px solid var(--border); padding-left: 10px;" onclick="toggleInlinePromptImprover()">
+             <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent); font-size: 0.78rem;" title="AI Prompt Improvement"></i>
+             <span style="font-size: 0.68rem; font-weight: 500; color: var(--text-secondary);">Improve Prompt</span>
+             <div id="inline-improve-toggle" style="width: 28px; height: 16px; border-radius: 8px; background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border); position: relative; transition: all 0.2s; flex-shrink: 0;">
+                <div id="inline-improve-knob" style="width: 10px; height: 10px; border-radius: 50%; background: var(--text-muted); position: absolute; top: 2px; left: 2px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 1px 3px rgba(0,0,0,0.4);"></div>
+             </div>
+          </div>
+        </div>
+
         <div class="input-box" id="input-box">
           <textarea
             class="input-textarea"
@@ -2880,6 +2966,7 @@ body, .message-bubble, .chat-list-item, #sidebar, #topbar, .modal, .modal-overla
             <button class="sidebar-footer-btn active" onclick="showSettingsContent('general',this)" id="stab-general" style="border-radius:var(--radius-md);"><i class="fa-solid fa-house"></i> General</button>
             <button class="sidebar-footer-btn" onclick="showSettingsContent('appearance',this)" id="stab-appearance" style="border-radius:var(--radius-md);"><i class="fa-solid fa-palette"></i> Appearance</button>
             <button class="sidebar-footer-btn" onclick="showSettingsContent('privacy',this)" id="stab-privacy" style="border-radius:var(--radius-md);"><i class="fa-solid fa-shield"></i> Privacy</button>
+            <button class="sidebar-footer-btn" onclick="showSettingsContent('ai',this)" id="stab-ai" style="border-radius:var(--radius-md);"><i class="fa-solid fa-wand-magic-sparkles"></i> AI</button>
             <button class="sidebar-footer-btn" onclick="showSettingsContent('about',this)" id="stab-about" style="border-radius:var(--radius-md);"><i class="fa-solid fa-circle-info"></i> About</button>
           </div>
         </div>
@@ -3014,6 +3101,32 @@ body, .message-bubble, .chat-list-item, #sidebar, #topbar, .modal, .modal-overla
             </div>
           </div>
           
+          <div id="stab-content-ai" class="hidden">
+            <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:16px">AI Settings</h3>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div class="setting-row">
+                <div class="setting-label">
+                  <span class="setting-name">Text Generator Source</span>
+                  <span class="setting-desc">Choose which AI text generation provider to use</span>
+                </div>
+                <select class="fancy-select" id="text-generator-source" onchange="updateTextGeneratorSource(this.value)">
+                  <option value="perchance">Perchance</option>
+                  <option value="pollinations">Pollinations</option>
+                </select>
+              </div>
+              <div class="setting-row">
+                <div class="setting-label">
+                  <span class="setting-name">Image Generator Source</span>
+                  <span class="setting-desc">Choose which AI image generation provider to use</span>
+                </div>
+                <select class="fancy-select" id="image-generator-source" onchange="updateImageGeneratorSource(this.value)">
+                  <option value="perchance">Perchance</option>
+                  <option value="pollinations">Pollinations</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           <div id="stab-content-about" class="hidden">
             <div style="text-align:center;padding:20px 0">
               <div style="width:60px;height:60px;background:linear-gradient(135deg,var(--accent),var(--cyan));border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:white;margin:0 auto 14px;box-shadow:var(--shadow-glow)"><i class="fa-solid fa-robot"></i></div>
@@ -3324,6 +3437,16 @@ body, .message-bubble, .chat-list-item, #sidebar, #topbar, .modal, .modal-overla
   </div>
 </div>
 
+<div class="modal-overlay hidden" id="image-viewer-modal" style="background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 10000;" onclick="closeModal('image-viewer-modal')">
+  <div class="image-viewer-content" style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: zoomIn 0.2s ease-out; background: transparent; padding: 20px;" onclick="event.stopPropagation()">
+    <div class="viewer-img-wrapper" style="position: relative; display: inline-block; max-width: 100%; max-height: 80vh;">
+      <img id="viewer-img" src="" style="max-width: 100%; max-height: 80vh; object-fit: contain; border-radius: var(--radius-md); box-shadow: 0 10px 45px rgba(0,0,0,0.6);" referrerpolicy="no-referrer">
+      <button class="viewer-close-btn" onclick="closeModal('image-viewer-modal')" title="Close Viewer"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="viewer-caption" style="margin-top: 16px; color: #fff; text-align: center; font-size: 0.95rem; font-weight: 500; font-style: italic; text-shadow: 0 2px 6px rgba(0,0,0,0.9); max-width: 650px; line-height: 1.4; padding: 0 10px;"></div>
+  </div>
+</div>
+
 <div id="cmd-palette" class="hidden">
   <div class="cmd-box">
     <div class="cmd-input-row">
@@ -3377,7 +3500,11 @@ let state = {
     topP: 0.9,
     compact: false,
     deleteMessageConfirmation: true,
-    ttsVoice: ''
+    ttsVoice: '',
+    textGeneratorSource: 'perchance',
+    imageGeneratorSource: 'perchance',
+    improveImagePrompts: false,
+    imageRatio: 'square'
   },
   persona: {
     active: 'moac',
@@ -3495,6 +3622,19 @@ function syncToggles() {
     const el = document.getElementById(t.id);
     if (el) el.classList.toggle('active', !!t.state);
   });
+
+  const bar = document.getElementById('image-config-bar');
+  if (bar) {
+    if (state.imageModeEnabled) {
+      bar.style.display = 'flex';
+      bar.classList.remove('hidden');
+      syncInlineImageBar();
+    } else {
+      bar.style.display = 'none';
+      bar.classList.add('hidden');
+    }
+  }
+  updateToastContainerPosition();
 }
 
 function loadState() {
@@ -3526,6 +3666,18 @@ function loadState() {
 function saveState() {
   if (!state.settings.autosave) return;
   try {
+    // Sync current messages back to active branch for each chat
+    if (state.chats) {
+       state.chats.forEach(chat => {
+          if (chat.branches && chat.activeBranchId) {
+             const activeBranch = chat.branches.find(b => b.id === chat.activeBranchId);
+             if (activeBranch) {
+                activeBranch.messages = [...chat.messages];
+             }
+          }
+       });
+    }
+
     const toSave = { ...state };
     delete toSave.isStreaming;
     if (state.settings.incognito) {
@@ -3611,6 +3763,32 @@ function applySettings() {
   const ttsSelect = document.getElementById('tts-voice-select');
   if (ttsSelect && state.settings.ttsVoice !== undefined) {
     ttsSelect.value = state.settings.ttsVoice;
+  }
+
+  const aiSourceSelect = document.getElementById('text-generator-source');
+  if (aiSourceSelect && state.settings.textGeneratorSource !== undefined) {
+      aiSourceSelect.value = state.settings.textGeneratorSource;
+  }
+  
+  const imgSourceSelect = document.getElementById('image-generator-source');
+  if (imgSourceSelect && state.settings.imageGeneratorSource !== undefined) {
+      imgSourceSelect.value = state.settings.imageGeneratorSource;
+  }
+
+  const improveImgSel = document.getElementById('settings-improve-image-prompts');
+  if (improveImgSel && state.settings.improveImagePrompts !== undefined) {
+      improveImgSel.value = state.settings.improveImagePrompts ? "true" : "false";
+  }
+
+  const ratioSel = document.getElementById('settings-image-ratio');
+  if (ratioSel && state.settings.imageRatio !== undefined) {
+      ratioSel.value = state.settings.imageRatio;
+  }
+
+  try {
+    syncInlineImageBar();
+  } catch (e) {
+    console.warn("syncInlineImageBar failed during applySettings", e);
   }
 
   updateInfoPanelSettings();
@@ -3711,6 +3889,365 @@ function toggleIncognito() {
   showToast('info', state.settings.incognito ? 'Incognito mode enabled' : 'Incognito mode disabled', 'History will not be saved.');
 }
 
+function updateTextGeneratorSource(value) {
+    state.settings.textGeneratorSource = value;
+    saveState();
+    
+    // Update UI if select exists
+    const aiSourceSelect = document.getElementById('text-generator-source');
+    if (aiSourceSelect) aiSourceSelect.value = value;
+    
+    showToast('info', 'Generator updated', `Text generation source set to ${value === 'pollinations' ? 'Pollinations' : 'Perchance'}.`);
+}
+
+function updateImageGeneratorSource(value) {
+    state.settings.imageGeneratorSource = value;
+    saveState();
+    
+    // Update UI if select exists
+    const imgSourceSelect = document.getElementById('image-generator-source');
+    if (imgSourceSelect) imgSourceSelect.value = value;
+    
+    showToast('info', 'Generator updated', `Image generation source set to ${value === 'pollinations' ? 'Pollinations' : 'Perchance'}.`);
+}
+
+function switchToPerchanceTextGenerator() {
+    updateTextGeneratorSource('perchance');
+}
+
+function switchToPerchanceImageGenerator() {
+    updateImageGeneratorSource('perchance');
+}
+
+function updateImproveImagePrompts(value) {
+    state.settings.improveImagePrompts = value;
+    saveState();
+    const select = document.getElementById('settings-improve-image-prompts');
+    if (select) select.value = value ? "true" : "false";
+    syncInlineImageBar();
+}
+
+function updateImageRatio(value) {
+    state.settings.imageRatio = value;
+    saveState();
+    const select = document.getElementById('settings-image-ratio');
+    if (select) select.value = value;
+    syncInlineImageBar();
+}
+
+function setImageRatio(ratio) {
+    updateImageRatio(ratio);
+}
+
+function toggleInlinePromptImprover() {
+    updateImproveImagePrompts(!state.settings.improveImagePrompts);
+}
+
+function syncInlineImageBar() {
+  const currentRatio = state.settings.imageRatio || 'square';
+  let activeBtn = null;
+  document.querySelectorAll('.ratio-btn').forEach(btn => {
+     const isMatch = btn.getAttribute('data-ratio') === currentRatio;
+     btn.classList.toggle('active', isMatch);
+     btn.style.background = 'none';
+     if (isMatch) {
+       activeBtn = btn;
+       btn.style.color = 'white';
+     } else {
+       btn.style.color = 'var(--text-secondary)';
+     }
+  });
+
+  const slider = document.getElementById('ratio-slider');
+  if (slider && activeBtn) {
+     const updateSlider = () => {
+       slider.style.left = activeBtn.offsetLeft + 'px';
+       slider.style.width = activeBtn.offsetWidth + 'px';
+       slider.style.height = activeBtn.offsetHeight + 'px';
+     };
+     updateSlider();
+     setTimeout(updateSlider, 0);
+  }
+
+  const improveOn = !!state.settings.improveImagePrompts;
+  const toggleBg = document.getElementById('inline-improve-toggle');
+  const toggleKnob = document.getElementById('inline-improve-knob');
+  if (toggleBg && toggleKnob) {
+     if (improveOn) {
+        toggleBg.style.background = 'var(--accent)';
+        toggleBg.style.borderColor = 'var(--accent)';
+        toggleKnob.style.left = '14px';
+        toggleKnob.style.background = 'white';
+     } else {
+        toggleBg.style.background = 'rgba(0,0,0,0.35)';
+        toggleBg.style.borderColor = 'var(--border)';
+        toggleKnob.style.left = '2px';
+        toggleKnob.style.background = 'var(--text-muted)';
+     }
+  }
+}
+
+async function improveImagePrompt(prompt) {
+  const enhancerInstruction = `You are an expert AI art director. 
+Improve the given image prompt to make it highly detailed, aesthetic, cinematic, and professional for tools like Midjourney or Stable Diffusion.
+Do NOT write introductory words, explanations, or quotes. ONLY respond with the final improved prompt, containing rich details and lighting.
+
+Original Prompt: "${prompt}"
+
+Enhanced Prompt:`;
+
+  try {
+    if (state.settings.textGeneratorSource === 'pollinations') {
+      const fetchFn = (typeof superFetch === 'function') ? superFetch : fetch;
+      const response = await fetchFn('https://text.pollinations.ai/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: enhancerInstruction }],
+          model: 'openai',
+          seed: Math.floor(Math.random() * 1000000000)
+        })
+      });
+      if (!response.ok) throw new Error('Pollinations API error');
+      const text = await response.text();
+      return text.trim().replace(/^["']|["']$/g, '');
+    } else {
+      // ALWAYS use native fetch for local endpoints to bypass any superFetch CORS proxy wrapper issues!
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          instruction: enhancerInstruction,
+          messages: [{ role: 'user', content: "Please enhance my prompt." }],
+          settings: { temp: 0.6, maxTokens: 150 }
+        })
+      });
+      if (!response.ok) throw new Error('Local API error');
+      const data = await response.json();
+      return data.text.trim().replace(/^["']|["']$/g, '');
+    }
+  } catch (e) {
+    console.warn("AI prompt improvement failed, using original prompt", e);
+    return prompt;
+  }
+}
+
+function forkChat(chatId, messageId) {
+  const parentChat = state.chats.find(c => c.id === chatId);
+  if (!parentChat) {
+    showToast('error', 'Fork failed', 'Parent chat not found.');
+    return;
+  }
+  
+  const msgIndex = parentChat.messages.findIndex(m => m.id === messageId);
+  if (msgIndex === -1) {
+    showToast('error', 'Fork failed', 'Message point not found.');
+    return;
+  }
+
+  // Initialize branches array if it doesn't exist
+  if (!parentChat.branches) {
+    parentChat.branches = [
+      { id: 'main', name: 'Main Timeline', messages: [...parentChat.messages] }
+    ];
+    parentChat.activeBranchId = 'main';
+  }
+
+  const originalSlice = parentChat.messages.slice(0, msgIndex + 1);
+  const clonedMessages = originalSlice.map(m => {
+    const clonedMsg = { ...m, id: generateId() };
+    if (m.variants) {
+      clonedMsg.variants = m.variants.map(v => ({ ...v, id: generateId() }));
+    }
+    return clonedMsg;
+  });
+
+  const branchId = 'branch_' + generateId();
+  const index = parentChat.branches.length;
+  const branchName = `Branch (Msg #${msgIndex + 1})`;
+  const newBranch = {
+    id: branchId,
+    name: branchName,
+    messages: clonedMessages,
+    createdAt: Date.now(),
+    parentId: parentChat.activeBranchId || 'main'
+  };
+
+  parentChat.branches.push(newBranch);
+  parentChat.activeBranchId = branchId;
+  parentChat.messages = clonedMessages;
+
+  saveState();
+  renderMessages(parentChat.messages);
+  renderBranchViewer();
+  updateChatTitleDisplay(parentChat);
+  renderChatList();
+  showToast('success', 'Timeline Branch Created', `Spun off new timeline: "${branchName}" inside this chat.`);
+}
+
+function renderBranchViewer() {
+  const btn = document.getElementById('topbar-branches-btn');
+  const countSpan = document.getElementById('topbar-branches-count');
+  const dropdown = document.getElementById('branches-dropdown');
+  if (!btn || !dropdown) return;
+  
+  const currentChat = getActiveChat();
+  if (!currentChat || !currentChat.messages || currentChat.messages.length === 0 || !currentChat.branches || currentChat.branches.length <= 1) {
+    btn.style.display = 'none';
+    return;
+  }
+  
+  btn.style.display = 'inline-flex';
+  countSpan.textContent = currentChat.branches.length;
+  
+  const activeBranchId = currentChat.activeBranchId || 'main';
+  
+  // Build a map for hierarchical tree
+  const nodes = {};
+  currentChat.branches.forEach(b => nodes[b.id] = { ...b, children: [] });
+  
+  // Build tree
+  const rootNodes = [];
+  currentChat.branches.forEach(b => {
+    if (b.parentId && nodes[b.parentId]) {
+      nodes[b.parentId].children.push(nodes[b.id]);
+    } else {
+      rootNodes.push(nodes[b.id]);
+    }
+  });
+  
+  function renderNode(node, depth) {
+    const isAct = node.id === activeBranchId;
+    const paddingLeft = 12 + (depth * 18);
+    const bg = isAct ? 'var(--accent-subtle)' : 'transparent';
+    const color = isAct ? 'var(--text-primary)' : 'var(--text-secondary)';
+    const weight = isAct ? '600' : '500';
+    
+    let html = `
+      <div class="dropdown-item" style="padding-left: ${paddingLeft}px; padding-right: 8px; background: ${bg}; color: ${color}; font-weight: ${weight}; display: flex; align-items: center; justify-content: space-between;" onclick="switchBranch('${node.id}'); toggleDropdown('branches-dropdown');">
+        <div style="display:flex;align-items:center;min-width:0;gap:8px">
+          <i class="fa-solid fa-code-branch" style="color: ${isAct ? 'var(--accent)' : 'var(--text-muted)'}; font-size: 0.8rem;"></i>
+          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px;">${escapeHtml(node.name)}</span>
+        </div>
+        ${node.id !== 'main' ? `
+          <button onclick="event.stopPropagation(); deleteBranch('${node.id}'); toggleDropdown('branches-dropdown');" style="color: var(--text-muted); background: none; border: none; padding: 4px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.color='var(--red)'; this.style.background='rgba(239,68,68,0.1)';" onmouseout="this.style.color='var(--text-muted)'; this.style.background='none';">
+             <i class="fa-solid fa-xmark"></i>
+          </button>
+        ` : ''}
+      </div>
+    `;
+    
+    if (node.children && node.children.length > 0) {
+      node.children.forEach(child => {
+        html += renderNode(child, depth + 1);
+      });
+    }
+    return html;
+  }
+  
+  let html = `<div style="padding: 8px 12px; font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Timeline Branches</div>`;
+  
+  rootNodes.forEach(node => {
+     html += renderNode(node, 0);
+  });
+  
+  html += `
+  `;
+  
+  dropdown.innerHTML = html;
+}
+
+function switchBranch(branchId) {
+  const currentChat = getActiveChat();
+  if (!currentChat || !currentChat.branches) return;
+  
+  const targetBranch = currentChat.branches.find(b => b.id === branchId);
+  if (!targetBranch) return;
+  
+  currentChat.activeBranchId = branchId;
+  currentChat.messages = targetBranch.messages || [];
+  
+  updateChatTitleDisplay(currentChat);
+
+  saveState();
+  renderMessages(currentChat.messages);
+  renderBranchViewer();
+  showToast('info', 'Switched Branch', `Switched to timeline: "${targetBranch.name}"`);
+}
+
+function deleteBranch(branchId) {
+  const currentChat = getActiveChat();
+  if (!currentChat || !currentChat.branches) return;
+  
+  showConfirm('DELETE BRANCH', `Are you sure you want to permanently delete this timeline branch? All unique messages in this branch will be lost.`, () => {
+    const activeBranchId = currentChat.activeBranchId || 'main';
+    
+    // Remove the branch
+    currentChat.branches = currentChat.branches.filter(b => b.id !== branchId);
+    
+    // If the active branch was deleted, switch back to 'main'
+    if (activeBranchId === branchId) {
+       currentChat.activeBranchId = 'main';
+       const mainBranch = currentChat.branches.find(b => b.id === 'main');
+       currentChat.messages = mainBranch ? mainBranch.messages : [];
+    }
+    
+    saveState();
+    renderMessages(currentChat.messages);
+    renderBranchViewer();
+    updateChatTitleDisplay(currentChat);
+    showToast('success', 'Branch Deleted', 'The selected timeline branch has been removed.');
+  });
+}
+
+function createNewEmptyBranch() {
+  const currentChat = getActiveChat();
+  if (!currentChat) return;
+  
+  if (!currentChat.branches) {
+    currentChat.branches = [
+      { id: 'main', name: 'Main Timeline', messages: [...currentChat.messages] }
+    ];
+    currentChat.activeBranchId = 'main';
+  }
+  
+  const branchId = 'branch_' + generateId();
+  const index = currentChat.branches.length;
+  const branchName = `Timeline Branch ${index + 1}`;
+  
+  // Make the new branch start with the parent's very first user message if available
+  const startMsgs = currentChat.messages.length > 0 ? [currentChat.messages[0]] : [];
+  
+  const newBranch = {
+    id: branchId,
+    name: branchName,
+    messages: startMsgs.map(m => ({ ...m, id: generateId() })),
+    createdAt: Date.now(),
+    parentId: currentChat.activeBranchId || 'main'
+  };
+
+  currentChat.branches.push(newBranch);
+  currentChat.activeBranchId = branchId;
+  currentChat.messages = newBranch.messages;
+  
+  saveState();
+  renderMessages(currentChat.messages);
+  renderBranchViewer();
+  showToast('success', 'Branch Created', `Started new timeline: "${branchName}"`);
+}
+
+function openImageViewer(src, caption) {
+  const modal = document.getElementById('image-viewer-modal');
+  const img = document.getElementById('viewer-img');
+  const cap = document.getElementById('viewer-caption');
+  if (modal && img && cap) {
+    img.src = src;
+    cap.textContent = caption || '';
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
 function factoryReset() {
   showConfirm('FACTORY RESET', 'DANGER: This will permanently wipe ALL chats, personas, settings, and local data. Continue?', () => {
     localStorage.removeItem('moac-state');
@@ -3770,6 +4307,17 @@ function newChat() {
   }
 }
 
+function updateChatTitleDisplay(chat) {
+  const titleInput = document.getElementById('chat-title-input');
+  if (!titleInput || !chat) return;
+  if (chat.activeBranchId && chat.activeBranchId !== 'main' && chat.branches) {
+    const branch = chat.branches.find(b => b.id === chat.activeBranchId);
+    titleInput.value = branch ? branch.name : (chat.title || '');
+  } else {
+    titleInput.value = chat.title || '';
+  }
+}
+
 function setActiveChat(id, force = false) {
   if (!force && state.activeChatId === id) {
     if (window.innerWidth <= 768 && state.sidebarOpen) {
@@ -3781,6 +4329,24 @@ function setActiveChat(id, force = false) {
   state.activeChatId = id;
   const chat = state.chats.find(c => c.id === id);
   if (!chat) return;
+
+  // Initialize branches securely if not exists
+  if (!chat.branches) {
+    chat.branches = [
+      { id: 'main', name: 'Main Timeline', messages: [...chat.messages] }
+    ];
+    chat.activeBranchId = 'main';
+  } else {
+    // Standard validation: align active messages
+    const activeBranch = chat.branches.find(b => b.id === chat.activeBranchId);
+    if (activeBranch) {
+      chat.messages = activeBranch.messages;
+    } else {
+      chat.activeBranchId = 'main';
+      const mainBranch = chat.branches.find(b => b.id === 'main');
+      if (mainBranch) chat.messages = mainBranch.messages;
+    }
+  }
 
   saveState();
 
@@ -3805,8 +4371,9 @@ function setActiveChat(id, force = false) {
       state.persona.active = PERSONAS[0].id; // or some global default
   }
 
-  document.getElementById('chat-title-input').value = chat.title || '';
+  updateChatTitleDisplay(chat);
   renderMessages(chat.messages);
+  renderBranchViewer();
   renderChatList();
   updateStats();
   renderChatTags();
@@ -3853,6 +4420,11 @@ function createChatItemEl(chat) {
   
   const isStreamingThis = state.isStreaming && state.streamingChatId === chat.id;
   
+  const hasBranches = chat.branches && chat.branches.length > 1;
+  const branchBadgeHtml = hasBranches 
+    ? `<span style="margin-left: 6px; font-size: 0.72rem; color: var(--accent); display: inline-flex; align-items: center; gap: 3px; font-weight: 500;" title="This chat has ${chat.branches.length} timeline branches"><i class="fa-solid fa-code-branch"></i>${chat.branches.length}</span>` 
+    : '';
+
   // Show a pin icon in front of the chat title if it's pinned in its folder/uncategorized view
   const titleHtml = chat.pinned 
     ? `<i class="fa-solid fa-thumbtack text-accent" style="color:var(--accent); font-size:0.72rem; margin-right:4px;"></i>${escapeHtml(chat.title || 'New Chat')}`
@@ -3864,8 +4436,7 @@ function createChatItemEl(chat) {
       <div class="chat-item-title">${titleHtml}</div>
       <div class="chat-item-meta">
         <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; flex-shrink:1">${escapeHtml(pName)}</span>
-        <span style="opacity:0.5;margin:0 4px;flex-shrink:0">•</span>
-        <span style="flex-shrink:0">${chat.messages?.length || 0} msg</span>
+        ${branchBadgeHtml}
         ${isStreamingThis ? `
           <div class="inline-typing" style="margin-left:6px;gap:3px">
             <span class="typing-dot" style="width:4px;height:4px;background:var(--accent)"></span>
@@ -4274,7 +4845,7 @@ function renameChat(id) {
       }
     }
     renderChatList();
-    if (id === state.activeChatId) document.getElementById('chat-title-input').value = chat.title;
+    if (id === state.activeChatId) updateChatTitleDisplay(chat);
     saveState();
   });
 }
@@ -4376,11 +4947,12 @@ function createMessageEl(msg) {
   let imageHtml = '';
   if (msg.image) {
     const altText = msg.imagePrompt ? escapeHtml(msg.imagePrompt) : 'Generated Image';
+    const imgMarginTop = msg.content ? '12px' : '0';
     imageHtml = `
-      <div class="image-card-container" style="margin-top: 12px; position: relative; border-radius: var(--radius-md); border: 1px solid var(--border); overflow: hidden; background: var(--bg-secondary);">
+      <div class="image-card-container" style="margin-top: ${imgMarginTop}; position: relative; border-radius: var(--radius-md); border: 1px solid var(--border); overflow: hidden; background: var(--bg-secondary); max-width: 340px; width: 100%;">
         <!-- Image itself in a hovered wrapper -->
-        <div style="position: relative; overflow: hidden;" class="image-wrapper">
-          <img src="${msg.image}" alt="${altText}" title="${altText}" style="width: 100%; display: block; object-fit: cover; border-radius: var(--radius-sm);" referrerpolicy="no-referrer">
+        <div style="position: relative; overflow: hidden; cursor: pointer;" class="image-wrapper">
+          <img src="${msg.image}" alt="${altText}" title="${altText}" onclick="openImageViewer(this.src, this.alt)" style="width: 100%; display: block; object-fit: cover; border-radius: var(--radius-sm); transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" referrerpolicy="no-referrer">
           <!-- Hover overlay down/up arrow -->
           <button class="image-details-toggle" onclick="toggleImageDetails(this, '${msg.id}')" title="Show details" style="position: absolute; bottom: 10px; right: 10px; width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.6); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s, background-color 0.2s; z-index: 5; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
             <i class="fa-solid fa-chevron-down" style="font-size: 0.9rem;"></i>
@@ -4407,6 +4979,8 @@ function createMessageEl(msg) {
     `;
   }
 
+  const isImageMsg = !isUser && (msg.image || msg.imagePrompt || (state.isStreaming && msg.id === state.streamingMsgId && state.imageModeEnabled));
+
   let content = '';
   if (isUser) {
     content = escapeHtml(msg.content);
@@ -4419,7 +4993,12 @@ function createMessageEl(msg) {
         <span class="typing-dot"></span>
       </div>`;
     } else {
-      content = state.settings.markdown ? renderMarkdown(msg.content) : escapeHtml(msg.content);
+      const rawText = state.settings.markdown ? renderMarkdown(msg.content) : escapeHtml(msg.content);
+      if (isImageMsg && msg.content) {
+        content = `<div class="image-msg-text" style="padding: 4px 6px; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-primary); font-weight: 500;">${rawText}</div>`;
+      } else {
+        content = rawText;
+      }
     }
   }
 
@@ -4446,7 +5025,7 @@ function createMessageEl(msg) {
       ${msg.pinned ? `<i class="fa-solid fa-thumbtack text-accent" style="color:var(--accent); font-size:0.75rem; margin-left:6px;" title="Pinned Message"></i>` : ''}
       ${variantsHtml}
     </div>
-    <div class="message-bubble ${isUser ? 'user-bubble' : `ai-bubble${msg.error ? ' error' : ''}`}" id="bubble-${msg.id}" ondblclick="copyMessage('${msg.id}')" title="Double click to copy">
+    <div class="message-bubble ${isUser ? 'user-bubble' : `ai-bubble${msg.error ? ' error' : ''} ${isImageMsg ? 'image-bubble-wrap' : ''}`}" id="bubble-${msg.id}" ondblclick="copyMessage('${msg.id}')">
       ${content}${filesHtml}${imageHtml}
     </div>
     <div class="message-actions">
@@ -4454,6 +5033,7 @@ function createMessageEl(msg) {
         <button class="msg-action-btn" id="speak-btn-${msg.id}" onclick="speakMessage('${msg.id}')" title="Read Aloud"><i class="fa-solid ${speakingMsgId === msg.id ? 'fa-stop text-accent" style="color:var(--accent);' : 'fa-volume-high'}"></i></button>
         <button class="msg-action-btn" onclick="copyMessage('${msg.id}')" title="Copy"><i class="fa-solid fa-copy"></i></button>
         <button class="msg-action-btn" onclick="editMessage('${msg.id}')" title="Edit"><i class="fa-solid fa-pencil"></i></button>
+        <button class="msg-action-btn" onclick="forkChat(state.activeChatId, '${msg.id}')" title="Fork chat from this message"><i class="fa-solid fa-code-fork"></i></button>
         <button class="msg-action-btn" onclick="togglePinMessage('${msg.id}')" title="${msg.pinned ? 'Unpin message' : 'Pin message'}"><i class="fa-solid fa-thumbtack" style="${msg.pinned ? 'color:var(--accent)' : ''}"></i></button>
         <button class="msg-action-btn" onclick="likeMessage('${msg.id}', this)" title="Good response"><i class="fa-solid fa-thumbs-up"></i></button>
         <button class="msg-action-btn" onclick="dislikeMessage('${msg.id}', this)" title="Bad response"><i class="fa-solid fa-thumbs-down"></i></button>
@@ -4463,6 +5043,7 @@ function createMessageEl(msg) {
         <button class="msg-action-btn" id="speak-btn-${msg.id}" onclick="speakMessage('${msg.id}')" title="Read Aloud"><i class="fa-solid ${speakingMsgId === msg.id ? 'fa-stop text-accent" style="color:var(--accent);' : 'fa-volume-high'}"></i></button>
         <button class="msg-action-btn" onclick="copyMessage('${msg.id}')" title="Copy"><i class="fa-solid fa-copy"></i></button>
         <button class="msg-action-btn" onclick="editMessage('${msg.id}')" title="Edit"><i class="fa-solid fa-pencil"></i></button>
+        <button class="msg-action-btn" onclick="forkChat(state.activeChatId, '${msg.id}')" title="Fork chat from this message"><i class="fa-solid fa-code-fork"></i></button>
         <button class="msg-action-btn" onclick="togglePinMessage('${msg.id}')" title="${msg.pinned ? 'Unpin message' : 'Pin message'}"><i class="fa-solid fa-thumbtack" style="${msg.pinned ? 'color:var(--accent)' : ''}"></i></button>
         <button class="msg-action-btn" onclick="deleteMessage('${msg.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
       `}
@@ -4560,7 +5141,7 @@ async function sendMessage(fromButton = false) {
 
   if (chat.messages.length === 0 && text) {
     chat.title = text.length > 40 ? text.slice(0, 40) + '…' : text;
-    document.getElementById('chat-title-input').value = chat.title;
+    updateChatTitleDisplay(chat);
   }
 
   const files = [...state.contextFiles];
@@ -4795,17 +5376,33 @@ async function callIntegratedGenerator(chat, aiMsg, isImageResp = false) {
        // Use global generateImage function or fallback
        const imgGenFn = (typeof generateImage === 'function') ? generateImage : fallbackGenerateImage;
        if (typeof imgGenFn === 'function') {
-          const loadingHtml = `<div class="image-placeholder" style="width: 100%; aspect-ratio: 1/1; max-width: 512px; background: var(--bg-tertiary); border: 2px dashed var(--border); border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); margin-top: 8px;">
+          let finalPrompt = prompt;
+          let loadingStep = "Generating image...";
+          let isEnhanced = !!state.settings.improveImagePrompts;
+          
+          if (isEnhanced) {
+             loadingStep = "Step 1/2: Enhancing prompt with AI...";
+          }
+          
+          let loadingHtml = `<div class="image-placeholder" style="width: 100%; aspect-ratio: 1/1; max-width: 512px; background: var(--bg-tertiary); border: 2px dashed var(--border); border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); margin-top: 8px;">
              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin" style="margin-bottom: 8px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-             <span style="font-size: 0.85rem;">Generating image...</span>
-             <span style="font-size: 0.75rem; opacity: 0.7; margin-top: 4px; text-align: center; max-width: 80%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">"${escapeHtml(prompt)}"</span>
+             <span id="img-loading-step" style="font-size: 0.85rem; font-weight: 500;">${loadingStep}</span>
+             <span id="img-loading-prompt" style="font-size: 0.75rem; opacity: 0.7; margin-top: 4px; text-align: center; max-width: 80%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">"${escapeHtml(prompt)}"</span>
           </div>`;
           bubble.innerHTML = loadingHtml;
+          
+          if (isEnhanced) {
+             finalPrompt = await improveImagePrompt(prompt);
+             const stepEl = document.getElementById('img-loading-step');
+             const promptEl = document.getElementById('img-loading-prompt');
+             if (stepEl) stepEl.textContent = "Step 2/2: Generating image...";
+             if (promptEl) promptEl.textContent = `"${escapeHtml(finalPrompt)}"`;
+          }
           
           const targetSeed = Math.floor(Math.random() * 2147483647);
           
           let result = await imgGenFn(
-            `${prompt}, masterpiece, highly detailed, sharp focus, 8k, square aspect ratio`,
+            `${finalPrompt}, masterpiece, highly detailed, sharp focus, 8k`,
             { resolution: "768x768", seed: targetSeed }
           );
           
@@ -4817,13 +5414,13 @@ async function callIntegratedGenerator(chat, aiMsg, isImageResp = false) {
           }
           
           aiMsg.image = imageUrl;
-          aiMsg.imagePrompt = prompt;
+          aiMsg.imagePrompt = finalPrompt;
           aiMsg.imageSeed = finalSeed;
           aiMsg.content = "Here is the generated image.";
           if (aiMsg.variants && aiMsg.variants[aiMsg.currentVariant]) {
             aiMsg.variants[aiMsg.currentVariant].content = aiMsg.content;
             aiMsg.variants[aiMsg.currentVariant].image = aiMsg.image;
-            aiMsg.variants[aiMsg.currentVariant].imagePrompt = prompt;
+            aiMsg.variants[aiMsg.currentVariant].imagePrompt = finalPrompt;
             aiMsg.variants[aiMsg.currentVariant].imageSeed = finalSeed;
           }
           
@@ -5219,7 +5816,7 @@ function toggleFullscreen() {
 
 // Close dropdowns on outside click
 document.addEventListener('click', e => {
-  if (!e.target.closest('#pref-btn') && !e.target.closest('.dropdown-menu')) {
+  if (!e.target.closest('#pref-btn') && !e.target.closest('#topbar-branches-btn') && !e.target.closest('.dropdown-menu')) {
     document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.add('hidden'));
   }
 });
@@ -5251,6 +5848,34 @@ async function fallbackGenerateText({ instruction, maxTokens, temperature, topP,
   const fetchFn = (typeof superFetch === 'function') ? superFetch : fetch;
   const chat = getActiveChat();
   const settingsOverrides = { ...state.settings, maxTokens, temp: temperature, topP, freqPenalty, presPenalty, stopSequences };
+  
+  if (state.settings.textGeneratorSource === 'pollinations') {
+      const promise = (async () => {
+          try {
+              const response = await fetchFn('https://text.pollinations.ai/', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                      messages: chat ? chat.messages : [{ role: 'user', content: instruction }],
+                      model: 'openai',
+                      seed: Math.floor(Math.random() * 1000000000)
+                  })
+              });
+              if (!response.ok) throw new Error('Pollinations API error');
+              const text = await response.text();
+              onChunk({ textChunk: text });
+          } catch (e) {
+              console.error('Pollinations text gen failed', e);
+              showConfirm('Generation Failed', 'The Pollinations text generation service failed. Would you like to switch back to the native Perchance generator?', () => {
+                  switchToPerchanceTextGenerator();
+              });
+              throw e;
+          }
+      })();
+      promise.stop = () => {};
+      return promise;
+  }
+  
   const response = await fetchFn('/api/chat/stream', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -5295,16 +5920,31 @@ async function fallbackGenerateText({ instruction, maxTokens, temperature, topP,
 
 async function fallbackGenerateImage(prompt, config = {}) {
   const fetchFn = (typeof superFetch === 'function') ? superFetch : fetch;
-  const payload = { prompt };
+  const payload = { 
+    prompt, 
+    source: state.settings.imageGeneratorSource,
+    ratio: state.settings.imageRatio || 'square'
+  };
   if (config.seed !== undefined) payload.seed = config.seed;
-  const response = await fetchFn('/api/image', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-  const data = await response.json();
-  if (data.error) throw new Error(data.error);
-  return { imageUrl: data.imageUrl, seed: data.seed };
+  
+  try {
+      const response = await fetchFn('/api/image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      return { imageUrl: data.imageUrl, seed: data.seed };
+  } catch (e) {
+      console.error('Pollinations image gen failed', e);
+      if (state.settings.imageGeneratorSource === 'pollinations') {
+          showConfirm('Image Generation Failed', 'The Pollinations image generation service failed. Would you like to switch back to the native Perchance generator?', () => {
+              switchToPerchanceImageGenerator();
+          });
+      }
+      throw e;
+  }
 }
 
 function showPersonaList() {
@@ -6654,9 +7294,23 @@ function toggleCodeMode() {
 function toggleImageMode() {
   state.imageModeEnabled = !state.imageModeEnabled;
   const btn = document.getElementById('image-btn');
-  btn.classList.toggle('active', state.imageModeEnabled);
+  if (btn) btn.classList.toggle('active', state.imageModeEnabled);
   updatePlaceholder(false);
-  showToast(state.imageModeEnabled ? 'info' : 'info', state.imageModeEnabled ? 'Image generation enabled' : 'Image generation disabled', '');
+  
+  const bar = document.getElementById('image-config-bar');
+  if (bar) {
+    if (state.imageModeEnabled) {
+      bar.style.display = 'flex';
+      bar.classList.remove('hidden');
+      syncInlineImageBar();
+    } else {
+      bar.style.display = 'none';
+      bar.classList.add('hidden');
+    }
+  }
+  updateToastContainerPosition();
+  
+  showToast('info', state.imageModeEnabled ? 'Image generation enabled' : 'Image generation disabled', '');
 }
 
 function toggleVoice() {
@@ -7158,7 +7812,7 @@ function editMessage(id) {
   openModal('edit-message-modal');
   ta.focus();
 }
-[fetcher("moac")]
+
 function exportChat() {
   const chat = getActiveChat();
   if (!chat) return;
@@ -7580,8 +8234,16 @@ function setupEventListeners() {
     titleInput.addEventListener('blur', () => {
       const chat = getActiveChat();
       if (chat) {
-        chat.title = titleInput.value.trim();
-        renderChatList();
+        if (chat.activeBranchId && chat.activeBranchId !== 'main') {
+          const targetBranch = chat.branches.find(b => b.id === chat.activeBranchId);
+          if (targetBranch) {
+            targetBranch.name = titleInput.value.trim() || 'Untitled Branch';
+            renderBranchViewer();
+          }
+        } else {
+          chat.title = titleInput.value.trim() || 'Untitled chat';
+          renderChatList();
+        }
         saveState();
       }
     });
@@ -7664,6 +8326,18 @@ function setupEventListeners() {
     e.preventDefault();
     Array.from(e.dataTransfer.files).forEach(f => addContextFile(f));
   });
+}
+
+function updateToastContainerPosition() {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  const bar = document.getElementById('image-config-bar');
+  const isBarVisible = bar && bar.style.display !== 'none' && !bar.classList.contains('hidden');
+  if (isBarVisible) {
+    container.style.bottom = '156px';
+  } else {
+    container.style.bottom = '100px';
+  }
 }
 
 function showToast(type, title, msg, duration = 3500) {
