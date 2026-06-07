@@ -2535,21 +2535,21 @@ body, .message-bubble, .chat-list-item, #sidebar, #topbar, .modal, .modal-overla
           <i class="fa-solid fa-bars"></i>
         </button>
         <input type="text" class="chat-title-input" id="chat-title-input" placeholder="Untitled chat" maxlength="80">
-        
-        <button class="topbar-toggle" onclick="toggleCmdPalette()" title="Search & Commands (⌘K)" style="margin-left: 8px;">
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-toggle" onclick="toggleCmdPalette()" title="Search & Commands (⌘K)">
           <i class="fa-solid fa-magnifying-glass"></i>
         </button>
 
-        <div style="position: relative; margin-left: 8px;">
+        <div style="position: relative;">
            <button class="btn btn-secondary btn-sm" id="topbar-branches-btn" onclick="toggleDropdown('branches-dropdown')" style="display: none;">
              <i class="fa-solid fa-code-branch text-accent"></i> <span id="topbar-branches-count" style="margin-left:4px; opacity:0.7"></span> <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; opacity: 0.6; margin-left:2px"></i>
            </button>
            <div class="dropdown-menu hidden" id="branches-dropdown" style="min-width: 260px; max-height: 60vh; overflow-y: auto; right: 0; left: auto;">
            </div>
         </div>
-      </div>
-      <div class="topbar-right">
-        <div style="position: relative; margin-left: 4px;">
+
+        <div style="position: relative;">
           <button class="btn btn-secondary btn-sm" onclick="toggleDropdown('pref-dropdown')" id="pref-btn">
             <i class="fa-solid fa-sliders"></i> Preferences <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; opacity: 0.6"></i>
           </button>
