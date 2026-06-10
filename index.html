@@ -439,7 +439,7 @@ ul, ol { list-style: none; }
 }
 
 .topbar-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
-.topbar-right { display: flex; align-items: center; gap: 6px; }
+.topbar-right { display: flex; align-items: center; gap: 4px; }
 
 .topbar-toggle {
   width: 34px;
@@ -2484,6 +2484,126 @@ body, .message-bubble, .chat-list-item, #sidebar, #topbar, .modal, .modal-overla
 #toast-container {
   transition: bottom 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
+
+/* Interactive Branching TreeMap Overlay Styles */
+.tree-node-card {
+  position: absolute;
+  width: 190px;
+  background: var(--bg-tertiary);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s ease, box-shadow 0.2s ease;
+  pointer-events: auto; /* permit interaction inside container */
+  cursor: pointer;
+  z-index: 5;
+}
+.tree-node-card:hover {
+  transform: translate(-50%, -50%) scale(1.05) !important;
+  border-color: var(--border-bright);
+  box-shadow: var(--shadow-md);
+  z-index: 20 !important;
+}
+.tree-node-card.active-branch-node {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--accent-subtle) 100%);
+  box-shadow: 0 0 16px var(--accent-glow);
+  z-index: 10;
+}
+.tree-node-card.active-branch-node:hover {
+  box-shadow: 0 0 24px var(--accent-glow), var(--shadow-md);
+}
+
+.tree-node-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+}
+.tree-node-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+.tree-node-title:hover {
+  text-decoration: underline;
+}
+
+.tree-node-meta {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.tree-node-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  padding-top: 6px;
+  margin-top: 2px;
+  gap: 6px;
+}
+.tree-node-btn {
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  padding: 3px 6px;
+  font-size: 0.65rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: var(--transition);
+}
+.tree-node-btn:hover {
+  background: var(--bg-glass-hover);
+  color: var(--text-primary);
+  border-color: var(--border-bright);
+}
+.tree-node-btn-danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f77;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.tree-node-rename-input {
+  width: 100%;
+  font-size: 0.75rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  outline: none;
+}
+
+#tree-map-canvas-container:active {
+  cursor: grabbing;
+}
+
+#tree-stat-total-branches {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
 </style>
 </head>
 <body>
@@ -2541,8 +2661,8 @@ body, .message-bubble, .chat-list-item, #sidebar, #topbar, .modal, .modal-overla
           <i class="fa-solid fa-magnifying-glass"></i>
         </button>
 
-        <div style="position: relative;">
-           <button class="btn btn-secondary btn-sm" id="topbar-branches-btn" onclick="toggleDropdown('branches-dropdown')" style="display: none;">
+        <div style="display: flex; align-items: center; gap: 6px; position: relative;">
+           <button class="btn btn-secondary btn-sm" id="topbar-branches-btn" onclick="toggleDropdown('branches-dropdown')" style="display: none;" title="Timeline branches list">
              <i class="fa-solid fa-code-branch text-accent"></i> <span id="topbar-branches-count" style="margin-left:4px; opacity:0.7"></span> <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; opacity: 0.6; margin-left:2px"></i>
            </button>
            <div class="dropdown-menu hidden" id="branches-dropdown" style="min-width: 260px; max-height: 60vh; overflow-y: auto; right: 0; left: auto;">
@@ -3127,9 +3247,9 @@ body, .message-bubble, .chat-list-item, #sidebar, #topbar, .modal, .modal-overla
             <div style="text-align:center;padding:20px 0">
               <div style="width:60px;height:60px;background:linear-gradient(135deg,var(--accent),var(--cyan));border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:white;margin:0 auto 14px;box-shadow:var(--shadow-glow)"><i class="fa-solid fa-robot"></i></div>
               <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:4px">MOAC</h2>
-              <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:20px">Version 3.0.0 — Advanced Intelligence Platform</p>
+              <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:20px">Version 0.8.8 — Advanced Intelligence Platform</p>
               <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:20px">
-                <span class="tag tag-purple">v3.0.0</span>
+                <span class="tag tag-purple">v0.8.8</span>
                 <span class="tag tag-green">Stable</span>
                 <span class="tag tag-blue">Local First</span>
               </div>
@@ -3417,6 +3537,74 @@ body, .message-bubble, .chat-list-item, #sidebar, #topbar, .modal, .modal-overla
   </div>
 </div>
 
+<div class="modal-overlay hidden" id="branch-tree-modal">
+  <div class="modal" style="max-width: 95vw; width: 1200px; height: 85vh; display: flex; flex-direction: column; overflow: hidden; padding: 0;">
+    <div class="modal-header" style="border-bottom: 1px solid var(--border); padding: 16px 24px;">
+      <div class="modal-title" style="display: flex; align-items: center; gap: 10px;">
+        <div class="modal-title-icon" style="background: var(--accent-subtle); color: var(--accent); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+          <i class="fa-solid fa-diagram-project"></i>
+        </div>
+        <div>
+          <div style="font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">Interactive Branching Map</div>
+          <p style="font-size: 0.78rem; font-weight: 400; color: var(--text-secondary); margin: 2px 0 0;">Visualize other conversations, switch timelines, or fork paths.</p>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal('branch-tree-modal')" style="background: none; border: none; padding: 8px; border-radius: 6px; cursor: pointer; color: var(--text-muted); transition: var(--transition);"><i class="fa-solid fa-xmark" style="font-size: 1.1rem;"></i></button>
+    </div>
+    
+    <div class="modal-body" style="flex: 1; display: flex; flex-direction: column; background: var(--bg-secondary); overflow: hidden; padding: 0; position: relative;">
+      <div style="padding: 12px 24px; border-bottom: 1px solid var(--border); background: var(--bg-primary); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; z-index: 10;">
+        <div style="display: flex; align-items: center; gap: 16px; font-size: 0.82rem; color: var(--text-secondary);">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-weight: 600; color: var(--text-primary);" id="tree-stat-total-branches">0</span> Timelines
+          </div>
+          <div style="width: 1px; height: 16px; background: var(--border);"></div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px var(--accent-glow);"></span>
+            <span>Active Timeline Path</span>
+          </div>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="background: var(--bg-tertiary); padding: 2px; border-radius: 6px; display: inline-flex; border: 1px solid var(--border);">
+            <button class="btn btn-sm" id="tree-layout-horiz-btn" onclick="setTreeLayout('horizontal')" style="padding: 4px 10px; font-size: 0.72rem; display: flex; align-items: center; gap: 4px; border: none;" title="Left-to-Right Timeline Graph">
+              <i class="fa-solid fa-arrows-left-right"></i> Horizontal
+            </button>
+            <button class="btn btn-sm btn-secondary" id="tree-layout-vert-btn" onclick="setTreeLayout('vertical')" style="padding: 4px 10px; font-size: 0.72rem; display: flex; align-items: center; gap: 4px; border: none;" title="Top-to-Bottom Diagram">
+              <i class="fa-solid fa-arrows-up-down"></i> Vertical
+            </button>
+          </div>
+          
+          <button class="btn btn-secondary btn-sm" onclick="centerActiveTreeNode()" style="display: flex; align-items: center; gap: 6px; height: 32px;" title="Reset drag pan onto focus node">
+            <i class="fa-solid fa-crosshairs"></i> Center Focus
+          </button>
+          
+          <button class="btn btn-primary btn-sm" onclick="createNewBranchFromMap()" style="display: flex; align-items: center; gap: 6px; height: 32px;" title="Spin up a fresh empty branch">
+            <i class="fa-solid fa-plus"></i> New Branch
+          </button>
+        </div>
+      </div>
+      
+      <div id="tree-map-canvas-container" style="flex: 1; overflow: auto; cursor: grab; user-select: none; position: relative;">
+        <div style="position: absolute; inset: 0; background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 24px 24px; pointer-events: none; opacity: 0.6; z-index: 1;"></div>
+        
+        <div id="tree-map-canvas-content" style="position: relative; z-index: 2; transition: width 0.2s, height 0.2s;">
+          <svg id="tree-map-svg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10%; overflow: visible;"></svg>
+          <div id="tree-map-nodes-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 15; pointer-events: none;"></div>
+        </div>
+      </div>
+      
+      <div id="branch-node-tooltip" class="hidden" style="position: absolute; width: 280px; background: rgba(17, 19, 24, 0.95); backdrop-filter: blur(12px); border: 1px solid var(--border-bright); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); pointer-events: none; z-index: 99; opacity: 0; transition: opacity 0.15s ease, transform 0.15s ease; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 2px;">
+          <span style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); tracking: 0.05em">Timeline Summary</span>
+          <span style="font-size: 0.68rem; color: var(--text-secondary);" id="tooltip-meta-info"></span>
+        </div>
+        <div id="tooltip-content-previews" style="display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay hidden" id="confirm-modal">
   <div class="modal" style="max-width: 400px;">
     <div class="modal-header">
@@ -3570,8 +3758,9 @@ var CMD_COMMANDS = [
   { icon: 'fa-trash', title: 'Clear Chat', desc: 'Delete all messages', action: () => clearChat(), category: 'Chat' }
 ];
 
-document.addEventListener('DOMContentLoaded', () => {
-  loadState();
+document.addEventListener('DOMContentLoaded', async () => {
+  await ImageDB.init();
+  await loadState();
   renderSuggestions();
   renderPersonas();
   renderChatList();
@@ -3592,12 +3781,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (window.innerWidth < 768) {
     state.rightPanelOpen = false;
-    document.getElementById('right-panel').classList.add('hidden');
+    const rp = document.getElementById('right-panel');
+    if (rp) rp.classList.add('hidden');
   }
 
   if (window.innerWidth < 768) {
     state.sidebarOpen = false;
-    document.getElementById('sidebar').classList.add('collapsed');
+    const sb = document.getElementById('sidebar');
+    if (sb) sb.classList.add('collapsed');
   }
 
   // Final render just in case
@@ -3633,7 +3824,112 @@ function syncToggles() {
   updateToastContainerPosition();
 }
 
-function loadState() {
+const ImageDB = {
+  db: null,
+  init() {
+    return new Promise((resolve) => {
+      try {
+        const request = indexedDB.open('moac-image-db', 1);
+        request.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains('images')) {
+            db.createObjectStore('images');
+          }
+        };
+        request.onsuccess = (e) => {
+          this.db = e.target.result;
+          resolve(true);
+        };
+        request.onerror = () => resolve(false);
+      } catch (e) {
+        resolve(false);
+      }
+    });
+  },
+  get(key) {
+    return new Promise((resolve) => {
+      if (!this.db) return resolve(null);
+      try {
+        const transaction = this.db.transaction(['images'], 'readonly');
+        const store = transaction.objectStore('images');
+        const request = store.get(key);
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => resolve(null);
+      } catch (e) { resolve(null); }
+    });
+  },
+  set(key, value) {
+    return new Promise((resolve) => {
+      if (!this.db) return resolve(false);
+      try {
+        const transaction = this.db.transaction(['images'], 'readwrite');
+        const store = transaction.objectStore('images');
+        store.put(value, key);
+        transaction.oncomplete = () => resolve(true);
+        transaction.onerror = () => resolve(false);
+      } catch (e) { resolve(false); }
+    });
+  }
+};
+
+async function extractAndStoreImages(node) {
+  if (!node || typeof node !== 'object') return;
+  
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      await extractAndStoreImages(item);
+    }
+  } else {
+    for (const key in node) {
+      if (node.hasOwnProperty(key)) {
+        const value = node[key];
+        if (key === 'image' && typeof value === 'string' && value.startsWith('data:image/')) {
+          const hash = 'img_' + Math.abs(hashCode(value)) + '_' + value.length;
+          await ImageDB.set(hash, value);
+          node[key] = `__idb__:${hash}`;
+        } else if (typeof value === 'object') {
+          await extractAndStoreImages(value);
+        }
+      }
+    }
+  }
+}
+
+async function restoreIndexedDBImages(node) {
+  if (!node || typeof node !== 'object') return;
+  
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      await restoreIndexedDBImages(item);
+    }
+  } else {
+    for (const key in node) {
+      if (node.hasOwnProperty(key)) {
+        const value = node[key];
+        if (key === 'image' && typeof value === 'string' && value.startsWith('__idb__:')) {
+          const hash = value.slice(8);
+          const original = await ImageDB.get(hash);
+          if (original) {
+            node[key] = original;
+          }
+        } else if (typeof value === 'object') {
+          await restoreIndexedDBImages(value);
+        }
+      }
+    }
+  }
+}
+
+function hashCode(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash;
+}
+
+async function loadState() {
   try {
     localStorage.setItem('__test__', '1');
     localStorage.removeItem('__test__');
@@ -3651,6 +3947,9 @@ function loadState() {
       if (!state.folders) state.folders = [];
       // Force web search disabled on load as requested
       state.webSearchEnabled = false;
+      
+      // Restore large base64 images from IndexedDB
+      await restoreIndexedDBImages(state);
     }
   } catch(e) {
     state.storageAvailable = false;
@@ -3659,7 +3958,7 @@ function loadState() {
   applySettings();
 }
 
-function saveState() {
+async function saveState() {
   if (!state.settings.autosave) return;
   try {
     // Sync current messages back to active branch for each chat
@@ -3674,13 +3973,17 @@ function saveState() {
        });
     }
 
-    const toSave = { ...state };
+    const toSave = typeof structuredClone === 'function' ? structuredClone(state) : JSON.parse(JSON.stringify(state));
+    await extractAndStoreImages(toSave);
+    
     delete toSave.isStreaming;
     if (state.settings.incognito) {
       toSave.chats = []; // Clear chats from saved state if incognito
     }
     localStorage.setItem('moac-state', JSON.stringify(toSave));
-  } catch(e) {}
+  } catch(e) {
+    console.error("Failed to save state:", e);
+  }
 }
 
 function applySettings() {
@@ -3984,8 +4287,7 @@ function syncInlineImageBar() {
 }
 
 async function improveImagePrompt(prompt) {
-  const enhancerInstruction = `You are an expert AI art director. 
-Improve the given image prompt to make it highly detailed, aesthetic, cinematic, and professional for tools like Midjourney or Stable Diffusion.
+  const enhancerInstruction = `Improve the given image prompt to make it highly detailed, aesthetic, cinematic, and professional for tools like Midjourney or Stable Diffusion.
 Do NOT write introductory words, explanations, or quotes. ONLY respond with the final improved prompt, containing rich details and lighting.
 
 Original Prompt: "${prompt}"
@@ -3995,17 +4297,19 @@ Enhanced Prompt:`;
   try {
     if (state.settings.textGeneratorSource === 'pollinations') {
       const fetchFn = (typeof superFetch === 'function') ? superFetch : fetch;
+      // Pollinations Text API: POST, response is plain text (NOT JSON)
       const response = await fetchFn('https://text.pollinations.ai/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [{ role: 'user', content: enhancerInstruction }],
           model: 'openai',
-          seed: Math.floor(Math.random() * 1000000000)
+          seed: Math.floor(Math.random() * 2147483647),
+          stream: false
         })
       });
-      if (!response.ok) throw new Error('Pollinations API error');
-      const text = await response.text();
+      if (!response.ok) throw new Error(`Pollinations API error: ${response.status}`);
+      const text = await response.text(); 
       return text.trim().replace(/^["']|["']$/g, '');
     } else {
       // ALWAYS use native fetch for local endpoints to bypass any superFetch CORS proxy wrapper issues!
@@ -4013,17 +4317,38 @@ Enhanced Prompt:`;
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          instruction: enhancerInstruction,
-          messages: [{ role: 'user', content: "Please enhance my prompt." }],
+          instruction: "You are an expert AI art director.",
+          messages: [{ role: 'user', content: enhancerInstruction }],
           settings: { temp: 0.6, maxTokens: 150 }
         })
       });
-      if (!response.ok) throw new Error('Local API error');
+      if (!response.ok) {
+        throw new Error('Local API error');
+      }
       const data = await response.json();
       return data.text.trim().replace(/^["']|["']$/g, '');
     }
   } catch (e) {
-    console.warn("AI prompt improvement failed, using original prompt", e);
+    console.warn("AI prompt improvement failed on primary source, trying pollinations fallback", e);
+    try {
+      const fetchFn = (typeof superFetch === 'function') ? superFetch : fetch;
+      const response = await fetchFn('https://text.pollinations.ai/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: enhancerInstruction }],
+          model: 'openai',
+          seed: Math.floor(Math.random() * 2147483647),
+          stream: false
+        })
+      });
+      if (response.ok) {
+        const text = await response.text();
+        return text.trim().replace(/^["']|["']$/g, '');
+      }
+    } catch (fallbackErr) {
+      console.warn("Pollinations prompt improvement fallback also failed", fallbackErr);
+    }
     return prompt;
   }
 }
@@ -4141,7 +4466,14 @@ function renderBranchViewer() {
     return html;
   }
   
-  let html = `<div style="padding: 8px 12px; font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Timeline Branches</div>`;
+  let html = `
+    <div style="border-bottom: 1px solid var(--border); margin-bottom: 4.5px;">
+      <div class="dropdown-item" style="gap: 8px; font-weight: 600; color: var(--accent); display: flex; align-items: center;" onclick="openBranchTreeModal(); toggleDropdown('branches-dropdown');">
+        <i class="fa-solid fa-diagram-project"></i> <span>Open Visual Map</span>
+      </div>
+    </div>
+    <div style="padding: 4px 12px 6px; font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Timeline Branches</div>
+  `;
   
   rootNodes.forEach(node => {
      html += renderNode(node, 0);
@@ -4230,6 +4562,534 @@ function createNewEmptyBranch() {
   renderMessages(currentChat.messages);
   renderBranchViewer();
   showToast('success', 'Branch Created', `Started new timeline: "${branchName}"`);
+}
+
+let activeTreeLayoutDirection = 'horizontal';
+
+function setTreeLayout(direction) {
+  activeTreeLayoutDirection = direction;
+  const horizBtn = document.getElementById('tree-layout-horiz-btn');
+  const vertBtn = document.getElementById('tree-layout-vert-btn');
+  if (direction === 'horizontal') {
+    horizBtn?.classList.remove('btn-secondary');
+    horizBtn?.classList.add('btn-primary');
+    vertBtn?.classList.add('btn-secondary');
+    vertBtn?.classList.remove('btn-primary');
+  } else {
+    vertBtn?.classList.remove('btn-secondary');
+    vertBtn?.classList.add('btn-primary');
+    horizBtn?.classList.add('btn-secondary');
+    horizBtn?.classList.remove('btn-primary');
+  }
+  drawBranchTree();
+}
+
+function layoutTimelineTree(rootNodes, direction = 'horizontal') {
+  let leafCount = 0;
+  
+  function assignPositions(node, depth) {
+    node.depth = depth;
+    if (!node.children || node.children.length === 0) {
+      node.leafIndex = leafCount;
+      leafCount++;
+    } else {
+      node.children.forEach(child => assignPositions(child, depth + 1));
+      const firstChild = node.children[0];
+      const lastChild = node.children[node.children.length - 1];
+      node.leafIndex = (firstChild.leafIndex + lastChild.leafIndex) / 2;
+    }
+  }
+  
+  rootNodes.forEach(root => assignPositions(root, 0));
+  
+  const nodeWidth = 190;
+  const nodeHeight = 84;
+  const colGap = 260;
+  const rowGap = 130;
+  const positionedNodes = [];
+  
+  function computeCoords(node) {
+    let x, y;
+    if (direction === 'horizontal') {
+      x = 55 + node.depth * colGap;
+      y = 65 + node.leafIndex * rowGap;
+    } else {
+      x = 100 + node.leafIndex * colGap;
+      y = 55 + node.depth * rowGap;
+    }
+    
+    positionedNodes.push({
+      id: node.id,
+      name: node.name,
+      messages: node.messages,
+      parentId: node.parentId,
+      x: x,
+      y: y,
+      depth: node.depth,
+      leafIndex: node.leafIndex,
+      childrenIds: node.children ? node.children.map(c => c.id) : []
+    });
+    
+    if (node.children) {
+      node.children.forEach(child => computeCoords(child));
+    }
+  }
+  
+  rootNodes.forEach(root => computeCoords(root));
+  
+  const maxX = positionedNodes.length > 0 ? Math.max(...positionedNodes.map(n => n.x)) : 0;
+  const maxY = positionedNodes.length > 0 ? Math.max(...positionedNodes.map(n => n.y)) : 0;
+  
+  return {
+    nodes: positionedNodes,
+    width: direction === 'horizontal' ? maxX + colGap + 50 : maxX + nodeWidth + 100,
+    height: direction === 'horizontal' ? maxY + nodeHeight + 100 : maxY + rowGap + 50
+  };
+}
+
+function isActivePathLine(childId, parentId, chat) {
+  const activeBranchId = chat.activeBranchId || 'main';
+  let curr = activeBranchId;
+  const path = [];
+  while (curr) {
+    path.push(curr);
+    const b = chat.branches ? chat.branches.find(x => x.id === curr) : null;
+    curr = b ? b.parentId : null;
+  }
+  const childIndex = path.indexOf(childId);
+  const parentIndex = path.indexOf(parentId);
+  return childIndex !== -1 && parentIndex !== -1 && Math.abs(childIndex - parentIndex) === 1;
+}
+
+function selectNodeFromMap(branchId) {
+  switchBranch(branchId);
+  document.querySelectorAll('.tree-node-card').forEach(c => {
+    c.classList.remove('active-branch-node');
+  });
+  const activeCard = document.getElementById(`tree-card-${branchId}`);
+  if (activeCard) {
+    activeCard.classList.add('active-branch-node');
+  }
+  drawBranchTree();
+}
+
+function startRenameBranchInline(branchId) {
+  const titleEl = document.getElementById(`tree-title-${branchId}`);
+  if (!titleEl) return;
+  
+  const currentChat = getActiveChat();
+  if (!currentChat) return;
+  
+  const b = currentChat.branches.find(x => x.id === branchId);
+  const currentName = b ? b.name : "Branch";
+  
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'tree-node-rename-input';
+  input.value = currentName;
+  
+  const parent = titleEl.parentNode;
+  parent.replaceChild(input, titleEl);
+  
+  input.focus();
+  input.select();
+  
+  function finishRename() {
+    const newName = input.value.trim() || currentName;
+    if (b) {
+      b.name = newName;
+      saveState();
+      renderBranchViewer();
+      updateChatTitleDisplay(currentChat);
+    }
+    
+    const newTitle = document.createElement('span');
+    newTitle.className = 'tree-node-title';
+    newTitle.id = `tree-title-${branchId}`;
+    newTitle.textContent = newName;
+    newTitle.title = newName;
+    newTitle.ondblclick = (e) => { e.stopPropagation(); startRenameBranchInline(branchId); };
+    
+    if (input.parentNode === parent) {
+      parent.replaceChild(newTitle, input);
+    }
+  }
+  
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.stopPropagation();
+      finishRename();
+    } else if (e.key === 'Escape') {
+      e.stopPropagation();
+      const newTitle = document.createElement('span');
+      newTitle.className = 'tree-node-title';
+      newTitle.id = `tree-title-${branchId}`;
+      newTitle.textContent = currentName;
+      newTitle.title = currentName;
+      newTitle.ondblclick = (e) => { e.stopPropagation(); startRenameBranchInline(branchId); };
+      if (input.parentNode === parent) {
+        parent.replaceChild(newTitle, input);
+      }
+    }
+  });
+  
+  input.addEventListener('blur', () => {
+    finishRename();
+  });
+}
+
+function createBranchForkFromNode(parentBranchId) {
+  const currentChat = getActiveChat();
+  if (!currentChat) return;
+  const parentBranch = currentChat.branches.find(b => b.id === parentBranchId);
+  if (!parentBranch) return;
+
+  const branchId = 'branch_' + generateId();
+  const index = currentChat.branches.length;
+  const branchName = `Fork of ${parentBranch.name}`;
+
+  const messagesCopy = parentBranch.messages.map(m => ({
+    ...m,
+    id: generateId(),
+    variants: m.variants ? m.variants.map(v => ({ ...v, id: generateId() })) : undefined
+  }));
+
+  const newBranch = {
+    id: branchId,
+    name: branchName,
+    messages: messagesCopy,
+    createdAt: Date.now(),
+    parentId: parentBranchId
+  };
+
+  currentChat.branches.push(newBranch);
+  currentChat.activeBranchId = branchId;
+  currentChat.messages = newBranch.messages;
+
+  saveState();
+  renderMessages(currentChat.messages);
+  renderBranchViewer();
+  updateChatTitleDisplay(currentChat);
+  drawBranchTree();
+  showToast('success', 'Timeline Forked', `Forked a new timeline from "${parentBranch.name}"`);
+}
+
+function deleteBranchFromMap(branchId) {
+  const currentChat = getActiveChat();
+  if (!currentChat) return;
+  
+  showConfirm('DELETE BRANCH', `Are you sure you want to permanently delete this timeline branch? All unique messages in this branch will be lost.`, () => {
+    const activeBranchId = currentChat.activeBranchId || 'main';
+    
+    currentChat.branches = currentChat.branches.filter(b => b.id !== branchId);
+    
+    if (activeBranchId === branchId) {
+       currentChat.activeBranchId = 'main';
+       const mainBranch = currentChat.branches.find(b => b.id === 'main');
+       currentChat.messages = mainBranch ? mainBranch.messages : [];
+    }
+    
+    saveState();
+    renderMessages(currentChat.messages);
+    renderBranchViewer();
+    updateChatTitleDisplay(currentChat);
+    drawBranchTree();
+    showToast('success', 'Branch Deleted', 'The timeline has been deleted from the branching map.');
+  });
+}
+
+function createNewBranchFromMap() {
+  createNewEmptyBranch();
+  drawBranchTree();
+  setTimeout(centerActiveTreeNode, 100);
+}
+
+function drawBranchTree() {
+  const currentChat = getActiveChat();
+  if (!currentChat || !currentChat.branches) return;
+  
+  const nodes = {};
+  currentChat.branches.forEach(b => nodes[b.id] = { ...b, children: [] });
+  
+  const rootNodes = [];
+  currentChat.branches.forEach(b => {
+    if (b.parentId && nodes[b.parentId]) {
+      nodes[b.parentId].children.push(nodes[b.id]);
+    } else {
+      rootNodes.push(nodes[b.id]);
+    }
+  });
+  
+  const layout = layoutTimelineTree(rootNodes, activeTreeLayoutDirection);
+  
+  const contentEl = document.getElementById('tree-map-canvas-content');
+  if (contentEl) {
+    contentEl.style.width = Math.max(layout.width, 800) + 'px';
+    contentEl.style.height = Math.max(layout.height, 500) + 'px';
+  }
+  
+  const totalBranchesSpan = document.getElementById('tree-stat-total-branches');
+  if (totalBranchesSpan) {
+    totalBranchesSpan.textContent = currentChat.branches.length;
+  }
+  
+  const svgEl = document.getElementById('tree-map-svg');
+  if (svgEl) {
+    svgEl.innerHTML = '';
+    svgEl.innerHTML += `
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="var(--border-bright)" />
+        </marker>
+        <marker id="arrow-active" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="var(--accent)" />
+        </marker>
+      </defs>
+    `;
+    
+    let pathsHtml = '';
+    layout.nodes.forEach(node => {
+      if (node.parentId) {
+        const parent = layout.nodes.find(n => n.id === node.parentId);
+        if (parent) {
+          let xp, yp, xc, yc, pathD;
+          const isActiveConnection = isActivePathLine(node.id, parent.id, currentChat);
+          const strokeColor = isActiveConnection ? 'var(--accent)' : 'var(--border-bright)';
+          const strokeWidth = isActiveConnection ? '2.5' : '1.5';
+          const strokeDash = isActiveConnection ? 'none' : '3 3';
+          const markerId = isActiveConnection ? 'arrow-active' : 'arrow';
+
+          if (activeTreeLayoutDirection === 'horizontal') {
+            xp = parent.x + 190;
+            yp = parent.y + 42;
+            xc = node.x;
+            yc = node.y + 42;
+            pathD = `M ${xp} ${yp} C ${xp + 45} ${yp}, ${xc - 45} ${yc}, ${xc} ${yc}`;
+          } else {
+            xp = parent.x + 95;
+            yp = parent.y + 84;
+            xc = node.x + 95;
+            yc = node.y;
+            pathD = `M ${xp} ${yp} C ${xp} ${yp + 45}, ${xc} ${yc - 45}, ${xc} ${yc}`;
+          }
+          
+          pathsHtml += `
+            <path d="${pathD}" stroke="${strokeColor}" stroke-width="${strokeWidth}" stroke-dasharray="${strokeDash}" fill="none" marker-end="url(#${markerId})" style="transition: stroke 0.3s, stroke-width 0.3s;" />
+          `;
+        }
+      }
+    });
+    svgEl.innerHTML += pathsHtml;
+  }
+  
+  const nodesContainer = document.getElementById('tree-map-nodes-container');
+  if (nodesContainer) {
+    nodesContainer.innerHTML = '';
+    layout.nodes.forEach(node => {
+      const activeBranchId = currentChat.activeBranchId || 'main';
+      const isActive = node.id === activeBranchId;
+      const msgCount = node.messages ? node.messages.length : 0;
+      
+      let previewText = "Empty timeline";
+      if (node.messages && node.messages.length > 0) {
+        const lastMsg = node.messages[node.messages.length - 1];
+        if (lastMsg) {
+          previewText = lastMsg.content || "Empty content";
+          if (previewText.length > 45) {
+            previewText = previewText.substring(0, 42) + '...';
+          }
+        }
+      }
+      
+      const cardEl = document.createElement('div');
+      cardEl.className = `tree-node-card ${isActive ? 'active-branch-node' : ''}`;
+      cardEl.id = `tree-card-${node.id}`;
+      cardEl.style.left = node.x + 'px';
+      cardEl.style.top = node.y + 'px';
+      
+      cardEl.innerHTML = `
+        <div class="tree-node-header">
+          <span class="tree-node-title" id="tree-title-${node.id}" title="${escapeHtml(node.name)}">${escapeHtml(node.name)}</span>
+          <button class="tree-node-btn" style="padding: 2px" title="Rename Branch" onclick="event.stopPropagation(); startRenameBranchInline('${node.id}')">
+            <i class="fa-solid fa-pen" style="font-size: 0.6rem;"></i>
+          </button>
+        </div>
+        <div style="font-size: 0.72rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">
+          "${escapeHtml(previewText)}"
+        </div>
+        <div class="tree-node-meta">
+          <span><i class="fa-solid fa-message opacity-60"></i> ${msgCount} msgs</span>
+          <span>${isActive ? '<span style="font-size:0.6rem; color:var(--accent); font-weight:700">ACTIVE</span>' : ''}</span>
+        </div>
+        <div class="tree-node-actions" onclick="event.stopPropagation();">
+          <button class="tree-node-btn" onclick="createBranchForkFromNode('${node.id}')" title="Fork fresh branch here">
+            <i class="fa-solid fa-code-fork"></i> Fork
+          </button>
+          ${node.id !== 'main' ? `
+            <button class="tree-node-btn tree-node-btn-danger" onclick="deleteBranchFromMap('${node.id}')" title="Delete timelines branch">
+              <i class="fa-solid fa-trash-can"></i> Del
+            </button>
+          ` : `<span style="font-size: 0.65rem; color: var(--text-muted); font-weight:500;">Original</span>`}
+        </div>
+      `;
+      
+      cardEl.addEventListener('click', () => {
+        selectNodeFromMap(node.id);
+      });
+      
+      cardEl.querySelector('.tree-node-title').addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        startRenameBranchInline(node.id);
+      });
+      
+      cardEl.addEventListener('mouseenter', () => {
+        const tooltip = document.getElementById('branch-node-tooltip');
+        if (!tooltip) return;
+        
+        const container = document.getElementById('tree-map-canvas-container');
+        const containerRect = container.getBoundingClientRect();
+        const cardRect = cardEl.getBoundingClientRect();
+        
+        const top = cardRect.top - containerRect.top + container.scrollTop - 10;
+        const left = cardRect.left - containerRect.left + container.scrollLeft + cardRect.width + 15;
+        
+        tooltip.style.top = top + 'px';
+        tooltip.style.left = left + 'px';
+        
+        const previewContainer = document.getElementById('tooltip-content-previews');
+        const metaInfo = document.getElementById('tooltip-meta-info');
+        
+        metaInfo.textContent = `${msgCount} messages`;
+        
+        let previewHtml = '';
+        const rawMsgs = node.messages || [];
+        const lastMsgs = rawMsgs.slice(-3);
+        if (lastMsgs.length === 0) {
+          previewHtml = '<div style="font-size: 0.72rem; color: var(--text-muted); font-style: italic;">No messages in this timeline</div>';
+        } else {
+          lastMsgs.forEach(msg => {
+            const isUser = msg.role === 'user';
+            const roleName = isUser ? 'You' : 'AI';
+            const color = isUser ? 'var(--accent)' : 'var(--text-primary)';
+            let text = msg.content || '';
+            if (text.length > 80) text = text.substring(0, 77) + '...';
+            
+            previewHtml += `
+              <div style="background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); padding: 4px 8px; border-left: 2px solid ${isUser ? 'var(--accent)' : 'var(--border)'}; font-size: 0.72rem;">
+                <div style="font-weight: 700; color: ${color}; font-size: 0.65rem; margin-bottom: 2px;">${roleName}</div>
+                <div style="color: var(--text-secondary); line-height: 1.3;">${escapeHtml(text)}</div>
+              </div>
+            `;
+          });
+        }
+        previewContainer.innerHTML = previewHtml;
+        
+        tooltip.classList.remove('hidden');
+        tooltip.style.opacity = '1';
+        tooltip.style.transform = 'translateY(0) scale(1)';
+      });
+      
+      cardEl.addEventListener('mouseleave', () => {
+        const tooltip = document.getElementById('branch-node-tooltip');
+        if (tooltip) {
+          tooltip.style.opacity = '0';
+          tooltip.style.transform = 'translateY(4px) scale(0.98)';
+          setTimeout(() => {
+            if (tooltip.style.opacity === '0') tooltip.classList.add('hidden');
+          }, 150);
+        }
+      });
+      
+      nodesContainer.appendChild(cardEl);
+    });
+  }
+}
+
+function centerActiveTreeNode() {
+  const currentChat = getActiveChat();
+  if (!currentChat) return;
+  
+  const activeBranchId = currentChat.activeBranchId || 'main';
+  const card = document.getElementById(`tree-card-${activeBranchId}`);
+  const container = document.getElementById('tree-map-canvas-container');
+  
+  if (card && container) {
+    const cardRect = card.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    
+    container.scrollTo({
+      left: card.offsetLeft - containerRect.width / 2 + cardRect.width / 2,
+      top: card.offsetTop - containerRect.height / 2 + cardRect.height / 2,
+      behavior: 'smooth'
+    });
+  }
+}
+
+function initTimelineMapPan() {
+  const container = document.getElementById('tree-map-canvas-container');
+  if (!container) return;
+  
+  let isDown = false;
+  let startX;
+  let startY;
+  let scrollLeft;
+  let scrollTop;
+  
+  container.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.tree-node-card') || e.target.closest('button') || e.target.closest('input')) return;
+    
+    isDown = true;
+    container.style.cursor = 'grabbing';
+    startX = e.pageX - container.offsetLeft;
+    startY = e.pageY - container.offsetTop;
+    scrollLeft = container.scrollLeft;
+    scrollTop = container.scrollTop;
+  });
+  
+  container.addEventListener('mouseleave', () => {
+    isDown = false;
+    container.style.cursor = 'grab';
+  });
+  
+  container.addEventListener('mouseup', () => {
+    isDown = false;
+    container.style.cursor = 'grab';
+  });
+  
+  container.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - container.offsetLeft;
+    const y = e.pageY - container.offsetTop;
+    const walkX = (x - startX) * 1.5;
+    const walkY = (y - startY) * 1.5;
+    container.scrollLeft = scrollLeft - walkX;
+    container.scrollTop = scrollTop - walkY;
+  });
+}
+
+function openBranchTreeModal() {
+  const currentChat = getActiveChat();
+  if (!currentChat) {
+    showToast('error', 'No active chat', 'Create a chat before exploring timeline maps.');
+    return;
+  }
+  
+  if (!currentChat.branches || currentChat.branches.length === 0) {
+    currentChat.branches = [
+      { id: 'main', name: 'Main Timeline', messages: [...currentChat.messages] }
+    ];
+    currentChat.activeBranchId = 'main';
+    saveState();
+  }
+  
+  openModal('branch-tree-modal');
+  setTreeLayout(activeTreeLayoutDirection);
+  initTimelineMapPan();
+  
+  setTimeout(() => {
+    centerActiveTreeNode();
+  }, 150);
 }
 
 function openImageViewer(src, caption) {
@@ -4944,11 +5804,18 @@ function createMessageEl(msg) {
   if (msg.image) {
     const altText = msg.imagePrompt ? escapeHtml(msg.imagePrompt) : 'Generated Image';
     const imgMarginTop = msg.content ? '12px' : '0';
+    const ratioType = msg.imageRatio || 'square';
+    let imgRatioStyle = '1 / 1';
+    if (ratioType === 'landscape') {
+      imgRatioStyle = '3 / 2';
+    } else if (ratioType === 'portrait') {
+      imgRatioStyle = '2 / 3';
+    }
     imageHtml = `
       <div class="image-card-container" style="margin-top: ${imgMarginTop}; position: relative; border-radius: var(--radius-md); border: 1px solid var(--border); overflow: hidden; background: var(--bg-secondary); max-width: 340px; width: 100%;">
         <!-- Image itself in a hovered wrapper -->
-        <div style="position: relative; overflow: hidden; cursor: pointer;" class="image-wrapper">
-          <img src="${msg.image}" alt="${altText}" title="${altText}" onclick="openImageViewer(this.src, this.alt)" style="width: 100%; display: block; object-fit: cover; border-radius: var(--radius-sm); transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" referrerpolicy="no-referrer">
+        <div style="position: relative; overflow: hidden; cursor: pointer; aspect-ratio: ${imgRatioStyle}; width: 100%;" class="image-wrapper">
+          <img src="${msg.image}" alt="${altText}" title="${altText}" onclick="openImageViewer(this.src, this.alt)" style="width: 100%; height: 100%; display: block; object-fit: cover; border-radius: var(--radius-sm); transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'" referrerpolicy="no-referrer">
           <!-- Hover overlay down/up arrow -->
           <button class="image-details-toggle" onclick="toggleImageDetails(this, '${msg.id}')" title="Show details" style="position: absolute; bottom: 10px; right: 10px; width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.6); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s, background-color 0.2s; z-index: 5; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
             <i class="fa-solid fa-chevron-down" style="font-size: 0.9rem;"></i>
@@ -4973,9 +5840,32 @@ function createMessageEl(msg) {
         </div>
       </div>
     `;
+  } else if (msg.isImage) {
+    const altText = msg.imagePrompt ? escapeHtml(msg.imagePrompt) : (msg.content ? escapeHtml(msg.content) : 'Generating image...');
+    const imgMarginTop = msg.content ? '12px' : '0';
+    const ratioType = msg.imageRatio || 'square';
+    let placeholderRatio = '1 / 1';
+    if (ratioType === 'landscape') {
+       placeholderRatio = '3 / 2';
+    } else if (ratioType === 'portrait') {
+       placeholderRatio = '2 / 3';
+    }
+    const loadingStep = (state.isStreaming && msg.id === state.streamingMsgId && state.settings.improveImagePrompts)
+      ? "Step 1/2: Enhancing prompt with AI..."
+      : "Generating image...";
+
+    imageHtml = `
+      <div class="image-placeholder-container" style="margin-top: ${imgMarginTop}; max-width: 340px; width: 100%;">
+        <div class="image-placeholder" style="width: 100%; aspect-ratio: ${placeholderRatio}; background: var(--bg-tertiary); border: 2px dashed var(--border); border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin" style="margin-bottom: 8px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+          <span class="img-loading-step" style="font-size: 0.85rem; font-weight: 500;">${loadingStep}</span>
+          <span class="img-loading-prompt" style="font-size: 0.75rem; opacity: 0.7; margin-top: 4px; text-align: center; max-width: 80%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">"${altText}"</span>
+        </div>
+      </div>
+    `;
   }
 
-  const isImageMsg = !isUser && (msg.image || msg.imagePrompt || (state.isStreaming && msg.id === state.streamingMsgId && state.imageModeEnabled));
+  const isImageMsg = !isUser && (msg.isImage || msg.image || msg.imagePrompt);
 
   let content = '';
   if (isUser) {
@@ -5072,6 +5962,32 @@ function createMessageEl(msg) {
   }
 
   return group;
+}
+
+// Add extension once globally
+try {
+  if (typeof marked !== 'undefined') {
+    marked.use({
+      extensions: [{
+        name: 'no-strike-dash',
+        level: 'inline',
+        start(src) { return src.indexOf('--'); },
+        tokenizer(src, tokens) {
+          const rule = /^--(?=\S)([\s\S]*?\S)--/;
+          const match = rule.exec(src);
+          if (match) {
+            return {
+              type: 'text',
+              raw: match[0],
+              text: match[0]
+            };
+          }
+        }
+      }]
+    });
+  }
+} catch (e) {
+  console.warn('Failed to add marked extension', e);
 }
 
 function renderMarkdown(text) {
@@ -5342,6 +6258,15 @@ async function callIntegratedGenerator(chat, aiMsg, isImageResp = false) {
 
   const instruction = `${personaHeader}${styleBlock}${codeInstructions}${imageInstructions}${webInstructions}${webSearchContent}\n\n# Conversation History:\n${history}\n\n${personaName}:`;
 
+  const isImageResponse = !!(isImageResp || state.imageModeEnabled);
+  if (isImageResponse) {
+     const lastUserMsg = [...chat.messages].reverse().find(m => m.role === 'user');
+     const prompt = lastUserMsg ? lastUserMsg.content : 'Abstract art';
+     aiMsg.isImage = true;
+     aiMsg.imagePrompt = prompt;
+     aiMsg.imageRatio = state.settings.imageRatio || 'square';
+  }
+
   const isNew = !chat.messages.some(m => m.id === aiMsg.id);
   if (isNew) {
     chat.messages.push(aiMsg);
@@ -5364,42 +6289,30 @@ async function callIntegratedGenerator(chat, aiMsg, isImageResp = false) {
 
   try {
     // Image Generation Logic
-    if (state.imageModeEnabled || isImageResp) {
-       // Find the last user message to use as prompt
-       const lastUserMsg = [...chat.messages].reverse().find(m => m.role === 'user');
-       const prompt = lastUserMsg ? lastUserMsg.content : 'Abstract art';
+    if (isImageResponse) {
+       const prompt = aiMsg.imagePrompt || 'Abstract art';
        
        // Use global generateImage function or fallback
-       const imgGenFn = (typeof generateImage === 'function') ? generateImage : fallbackGenerateImage;
+       const imgGenFn = (state.settings.imageGeneratorSource !== 'pollinations' && typeof generateImage === 'function') ? generateImage : fallbackGenerateImage;
        if (typeof imgGenFn === 'function') {
           let finalPrompt = prompt;
-          let loadingStep = "Generating image...";
           let isEnhanced = !!state.settings.improveImagePrompts;
-          
-          if (isEnhanced) {
-             loadingStep = "Step 1/2: Enhancing prompt with AI...";
-          }
-          
-          let loadingHtml = `<div class="image-placeholder" style="width: 100%; aspect-ratio: 1/1; max-width: 512px; background: var(--bg-tertiary); border: 2px dashed var(--border); border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); margin-top: 8px;">
-             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin" style="margin-bottom: 8px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-             <span id="img-loading-step" style="font-size: 0.85rem; font-weight: 500;">${loadingStep}</span>
-             <span id="img-loading-prompt" style="font-size: 0.75rem; opacity: 0.7; margin-top: 4px; text-align: center; max-width: 80%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">"${escapeHtml(prompt)}"</span>
-          </div>`;
-          bubble.innerHTML = loadingHtml;
+          const ratioType = aiMsg.imageRatio || 'square';
           
           if (isEnhanced) {
              finalPrompt = await improveImagePrompt(prompt);
-             const stepEl = document.getElementById('img-loading-step');
-             const promptEl = document.getElementById('img-loading-prompt');
-             if (stepEl) stepEl.textContent = "Step 2/2: Generating image...";
-             if (promptEl) promptEl.textContent = `"${escapeHtml(finalPrompt)}"`;
+             const stepEls = el.querySelectorAll('.img-loading-step');
+             const promptEls = el.querySelectorAll('.img-loading-prompt');
+             stepEls.forEach(stepEl => stepEl.textContent = "Step 2/2: Generating image...");
+             promptEls.forEach(promptEl => promptEl.textContent = `"${escapeHtml(finalPrompt)}"`);
           }
           
           const targetSeed = Math.floor(Math.random() * 2147483647);
+          const resolution = ratioType === 'landscape' ? '768x512' : (ratioType === 'portrait' ? '512x768' : '768x768');
           
           let result = await imgGenFn(
             `${finalPrompt}, masterpiece, highly detailed, sharp focus, 8k`,
-            { resolution: "768x768", seed: targetSeed }
+            { resolution: resolution, seed: targetSeed }
           );
           
           let imageUrl = result;
@@ -5412,12 +6325,14 @@ async function callIntegratedGenerator(chat, aiMsg, isImageResp = false) {
           aiMsg.image = imageUrl;
           aiMsg.imagePrompt = finalPrompt;
           aiMsg.imageSeed = finalSeed;
+          aiMsg.imageRatio = ratioType;
           aiMsg.content = "Here is the generated image.";
           if (aiMsg.variants && aiMsg.variants[aiMsg.currentVariant]) {
             aiMsg.variants[aiMsg.currentVariant].content = aiMsg.content;
             aiMsg.variants[aiMsg.currentVariant].image = aiMsg.image;
             aiMsg.variants[aiMsg.currentVariant].imagePrompt = finalPrompt;
             aiMsg.variants[aiMsg.currentVariant].imageSeed = finalSeed;
+            aiMsg.variants[aiMsg.currentVariant].imageRatio = ratioType;
           }
           
           // Re-render to show image, removing loader
@@ -5449,7 +6364,7 @@ async function callIntegratedGenerator(chat, aiMsg, isImageResp = false) {
       };
 
       let generationPromise;
-      if (typeof generateText === 'function') {
+      if (state.settings.textGeneratorSource !== 'pollinations' && typeof generateText === 'function') {
         const fullPrompt = chat.messages.map(m => m.content).join("\n") + "\n" + instruction;
         generationPromise = (async () => {
           const res = await generateText({
@@ -5491,27 +6406,50 @@ async function callIntegratedGenerator(chat, aiMsg, isImageResp = false) {
       await typewriterReveal(aiMsg.id, visibleText);
       currentText = fullText;
       
-      // Update message count in sidebar immediately after message is complete
-      renderChatList();
-
-      const imgMatch = currentText.match(/\[GENERATE_IMAGE:\s*(.*?)\]/s);
+      // Update      const imgMatch = currentText.match(/\[GENERATE_IMAGE:\s*(.*?)\]/s);
       if (imgMatch) {
           const prompt = imgMatch[1];
-          let dynamicBubble = document.querySelector(`.message-group[data-id="${aiMsg.id}"] .ai-bubble`);
-          if (dynamicBubble) {
-            dynamicBubble.innerHTML += `<div class="image-placeholder" style="width: 100%; aspect-ratio: 1/1; max-width: 512px; background: var(--bg-tertiary); border: 2px dashed var(--border); border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); margin-top: 8px;">
-               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin" style="margin-bottom: 8px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-               <span style="font-size: 0.85rem;">Generating image...</span>
-               <span style="font-size: 0.75rem; opacity: 0.7; margin-top: 4px; text-align: center; max-width: 80%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">"${escapeHtml(prompt)}"</span>
-            </div>`;
+          let isEnhanced = !!state.settings.improveImagePrompts;
+          const ratioType = state.settings.imageRatio || 'square';
+          
+          aiMsg.isImage = true;
+          aiMsg.imagePrompt = prompt;
+          aiMsg.imageRatio = ratioType;
+          
+          const finalTxt = currentText.replace(/\[GENERATE_IMAGE:.*?\]/s, '').trim();
+          aiMsg.content = finalTxt;
+          
+          if (aiMsg.variants && aiMsg.variants[aiMsg.currentVariant]) {
+             aiMsg.variants[aiMsg.currentVariant].content = aiMsg.content;
+             aiMsg.variants[aiMsg.currentVariant].isImage = true;
+             aiMsg.variants[aiMsg.currentVariant].imagePrompt = prompt;
+             aiMsg.variants[aiMsg.currentVariant].imageRatio = ratioType;
           }
+          
+          renderMessages(chat.messages, true);
+          
           const targetSeed = Math.floor(Math.random() * 2147483647);
-          const imgGenFn = (typeof generateImage === 'function') ? generateImage : fallbackGenerateImage;
+          const imgGenFn = (state.settings.imageGeneratorSource !== 'pollinations' && typeof generateImage === 'function') ? generateImage : fallbackGenerateImage;
           if (typeof imgGenFn === 'function') {
               try {
+                  let finalPrompt = prompt;
+                  if (isEnhanced) {
+                      finalPrompt = await improveImagePrompt(prompt);
+                      const container = document.getElementById('messages-container');
+                      const msgEl = container.querySelector(`.message-group[data-id="${aiMsg.id}"]`);
+                      if (msgEl) {
+                          const stepEls = msgEl.querySelectorAll('.img-loading-step');
+                          const promptEls = msgEl.querySelectorAll('.img-loading-prompt');
+                          stepEls.forEach(stepEl => stepEl.textContent = "Step 2/2: Generating image...");
+                          promptEls.forEach(promptEl => promptEl.textContent = `"${escapeHtml(finalPrompt)}"`);
+                      }
+                  }
+                  
+                  const resolution = ratioType === 'landscape' ? '768x512' : (ratioType === 'portrait' ? '512x768' : '768x768');
+                  
                   let result = await imgGenFn(
-                    `${prompt}, masterpiece, highly detailed, sharp focus, 8k, square aspect ratio`,
-                    { resolution: "768x768", seed: targetSeed }
+                    `${finalPrompt}, masterpiece, highly detailed, sharp focus, 8k`,
+                    { resolution: resolution, seed: targetSeed }
                   );
                   let imageUrl = result;
                   let finalSeed = targetSeed;
@@ -5521,24 +6459,30 @@ async function callIntegratedGenerator(chat, aiMsg, isImageResp = false) {
                   }
                   
                   aiMsg.image = imageUrl;
-                  aiMsg.imagePrompt = prompt;
+                  aiMsg.imagePrompt = finalPrompt;
                   aiMsg.imageSeed = finalSeed;
-                  const finalTxt = currentText.replace(/\[GENERATE_IMAGE:.*?\]/s, '').trim();
+                  aiMsg.imageRatio = ratioType;
                   aiMsg.content = finalTxt || "Here is the generated image.";
                   currentText = aiMsg.content;
                   if (aiMsg.variants && aiMsg.variants[aiMsg.currentVariant]) {
                     aiMsg.variants[aiMsg.currentVariant].content = aiMsg.content;
                     aiMsg.variants[aiMsg.currentVariant].image = aiMsg.image;
-                    aiMsg.variants[aiMsg.currentVariant].imagePrompt = prompt;
+                    aiMsg.variants[aiMsg.currentVariant].imagePrompt = finalPrompt;
                     aiMsg.variants[aiMsg.currentVariant].imageSeed = finalSeed;
+                    aiMsg.variants[aiMsg.currentVariant].imageRatio = ratioType;
                   }
                   
                   renderMessages(chat.messages, true);
               } catch (e) {
                   console.error("Image generation inside text failed:", e);
-                  currentText = currentText.replace(/\[GENERATE_IMAGE:.*?\]/s, '').trim() + `\n\n*(Failed to generate image: ${e.message})*`;
-                  dynamicBubble = document.querySelector(`.message-group[data-id="${aiMsg.id}"] .ai-bubble`);
-                  if (dynamicBubble) dynamicBubble.innerHTML = state.settings.markdown ? renderMarkdown(currentText) : escapeHtml(currentText);
+                  currentText = finalTxt + `\n\n*(Failed to generate image: ${e.message})*`;
+                  aiMsg.content = currentText;
+                  aiMsg.isImage = false;
+                  if (aiMsg.variants && aiMsg.variants[aiMsg.currentVariant]) {
+                     aiMsg.variants[aiMsg.currentVariant].content = aiMsg.content;
+                     aiMsg.variants[aiMsg.currentVariant].isImage = false;
+                  }
+                  renderMessages(chat.messages, true);
               }
           }
       }
@@ -5846,20 +6790,33 @@ async function fallbackGenerateText({ instruction, maxTokens, temperature, topP,
   const settingsOverrides = { ...state.settings, maxTokens, temp: temperature, topP, freqPenalty, presPenalty, stopSequences };
   
   if (state.settings.textGeneratorSource === 'pollinations') {
+      // Build a proper messages array: system context (if any) + the instruction as the final user message
+      const historyMessages = (chat && chat.messages && chat.messages.length > 0)
+          ? chat.messages.filter(m => m.role === 'user' || m.role === 'assistant').slice(-20)
+          : [];
+      const messagesPayload = [
+          ...historyMessages,
+          { role: 'user', content: instruction }
+      ];
+
       const promise = (async () => {
           try {
+              // Pollinations Text API: POST https://text.pollinations.ai/
+              // Body: { messages, model, seed, stream }
+              // Response: plain text (NOT JSON) — use response.text()
               const response = await fetchFn('https://text.pollinations.ai/', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
-                      messages: chat ? chat.messages : [{ role: 'user', content: instruction }],
+                      messages: messagesPayload,
                       model: 'openai',
-                      seed: Math.floor(Math.random() * 1000000000)
+                      seed: Math.floor(Math.random() * 2147483647),
+                      stream: false
                   })
               });
-              if (!response.ok) throw new Error('Pollinations API error');
-              const text = await response.text();
-              onChunk({ textChunk: text });
+              if (!response.ok) throw new Error(`Pollinations API error: ${response.status}`);
+              const text = await response.text(); // plain text response — do NOT use .json()
+              onChunk({ textChunk: text.trim() });
           } catch (e) {
               console.error('Pollinations text gen failed', e);
               showConfirm('Generation Failed', 'The Pollinations text generation service failed. Would you like to switch back to the native Perchance generator?', () => {
@@ -5915,23 +6872,45 @@ async function fallbackGenerateText({ instruction, maxTokens, temperature, topP,
 }
 
 async function fallbackGenerateImage(prompt, config = {}) {
-  const fetchFn = (typeof superFetch === 'function') ? superFetch : fetch;
-  const payload = { 
-    prompt, 
-    source: state.settings.imageGeneratorSource,
-    ratio: state.settings.imageRatio || 'square'
-  };
-  if (config.seed !== undefined) payload.seed = config.seed;
+  // Pollinations Image API: GET https://image.pollinations.ai/prompt/{url-encoded-prompt}
+  // Query params: width, height, model=flux, nologo=true, seed
+  // Returns: image binary directly — use the URL as <img src>. No API key required.
   
   try {
-      const response = await fetchFn('/api/image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await response.json();
-      if (data.error) throw new Error(data.error);
-      return { imageUrl: data.imageUrl, seed: data.seed };
+      const seed = (config.seed !== undefined) ? config.seed : Math.floor(Math.random() * 2147483647);
+      
+      // Determine dimensions from resolution or imageRatio setting
+      let width = 768;
+      let height = 768;
+      const ratio = state.settings.imageRatio || 'square';
+      if (config.resolution) {
+          const parts = config.resolution.split('x');
+          if (parts.length === 2) {
+              width = parseInt(parts[0], 10) || 768;
+              height = parseInt(parts[1], 10) || 768;
+          }
+      } else if (ratio === 'landscape' || ratio === '16:9') {
+          width = 1024; height = 576;
+      } else if (ratio === 'portrait' || ratio === '9:16') {
+          width = 576; height = 1024;
+      } else if (ratio === 'wide' || ratio === '3:2') {
+          width = 900; height = 600;
+      } else if (ratio === 'tall' || ratio === '2:3') {
+          width = 600; height = 900;
+      } else {
+          // square (default)
+          width = 768; height = 768;
+      }
+      
+      // Build the direct GET URL — no fetch needed, just use as img.src
+      const encodedPrompt = encodeURIComponent(prompt);
+      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&model=flux&nologo=true&seed=${seed}`;
+      
+      // Verify the URL loads correctly by pre-fetching the image
+      const response = await fetch(imageUrl);
+      if (!response.ok) throw new Error(`Pollinations image API error: ${response.status}`);
+      
+      return { imageUrl, seed };
   } catch (e) {
       console.error('Pollinations image gen failed', e);
       if (state.settings.imageGeneratorSource === 'pollinations') {
@@ -6380,7 +7359,7 @@ function switchWizardStep(stepNum) {
 }
 
 async function callOurTextGenerator(promptText) {
-  if (typeof generateText === 'function') {
+  if (state.settings.textGeneratorSource !== 'pollinations' && typeof generateText === 'function') {
     const res = await generateText({
       instruction: promptText,
       maxTokens: 1536,
@@ -7639,20 +8618,26 @@ function regenerateImage(msgId) {
   state.streamingMsgId = msg.id;
   updateSendBtn(true);
   
-  const loadingHtml = `<div class="image-placeholder" style="width: 100%; aspect-ratio: 1/1; max-width: 512px; background: var(--bg-tertiary); border: 2px dashed var(--border); border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); margin-top: 8px;">
-     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="animate-spin" style="margin-bottom: 8px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-     <span style="font-size: 0.85rem;">Generating image...</span>
-     <span style="font-size: 0.75rem; opacity: 0.7; margin-top: 4px; text-align: center; max-width: 80%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">"${escapeHtml(msg.imagePrompt)}"</span>
-  </div>`;
+  const ratioType = state.settings.imageRatio || 'square';
+  msg.image = null;
+  msg.isImage = true;
+  msg.imageRatio = ratioType;
   
-  const bubble = document.getElementById(`bubble-${msgId}`);
-  if (bubble) bubble.innerHTML = loadingHtml;
+  if (msg.variants && msg.variants[msg.currentVariant]) {
+     msg.variants[msg.currentVariant].image = null;
+     msg.variants[msg.currentVariant].isImage = true;
+     msg.variants[msg.currentVariant].imageRatio = ratioType;
+  }
+  
+  renderMessages(chat.messages, true);
 
   const targetSeed = Math.floor(Math.random() * 2147483647);
   
-  const imgGenFn = (typeof generateImage === 'function') ? generateImage : fallbackGenerateImage;
+  const imgGenFn = (state.settings.imageGeneratorSource !== 'pollinations' && typeof generateImage === 'function') ? generateImage : fallbackGenerateImage;
   
-  imgGenFn(`${msg.imagePrompt}, masterpiece, highly detailed, sharp focus, 8k, square aspect ratio`, { resolution: "768x768", seed: targetSeed })
+  const resolution = ratioType === 'landscape' ? '768x512' : (ratioType === 'portrait' ? '512x768' : '768x768');
+
+  imgGenFn(`${msg.imagePrompt}, masterpiece, highly detailed, sharp focus, 8k`, { resolution: resolution, seed: targetSeed })
     .then(result => {
         let imageUrl = result;
         let finalSeed = targetSeed;
@@ -7662,10 +8647,12 @@ function regenerateImage(msgId) {
         }
         msg.image = imageUrl;
         msg.imageSeed = finalSeed;
+        msg.imageRatio = ratioType;
         
         if (msg.variants && msg.variants[msg.currentVariant]) {
            msg.variants[msg.currentVariant].image = imageUrl;
            msg.variants[msg.currentVariant].imageSeed = finalSeed;
+           msg.variants[msg.currentVariant].imageRatio = ratioType;
         }
     })
     .catch(e => {
@@ -7772,8 +8759,14 @@ window.switchVariant = function(msgId, dir) {
   const newIndex = msg.currentVariant + dir;
   if (newIndex >= 0 && newIndex < msg.variants.length) {
       msg.currentVariant = newIndex;
-      msg.content = msg.variants[newIndex].content;
-      msg.image = msg.variants[newIndex].image;
+      const variant = msg.variants[newIndex];
+      msg.content = variant.content;
+      msg.image = variant.image;
+      msg.isImage = variant.isImage !== undefined ? variant.isImage : !!variant.image;
+      msg.imagePrompt = variant.imagePrompt || null;
+      msg.imageSeed = variant.imageSeed || null;
+      msg.imageRatio = variant.imageRatio || null;
+      
       renderMessages(chat.messages, true);
       saveState();
   }
